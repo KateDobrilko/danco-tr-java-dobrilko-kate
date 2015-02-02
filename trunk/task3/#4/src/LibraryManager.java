@@ -1,8 +1,7 @@
 public class LibraryManager
 {
 
-	public void subscribeBookOnReader(Library library, int bookNumber,
-			int readerNumber)
+	public void subscribeBookOnReader(Library library, int bookNumber, int readerNumber)
 	{
 		Book[] libBooks = library.getBooks();
 		Reader[] libReaders = library.getReaders();
@@ -37,8 +36,7 @@ public class LibraryManager
 
 	}
 
-	public void unsubscribeReader(Library library, int bookNumber,
-			int readerNumber)
+	public void unsubscribeReader(Library library, int bookNumber, int readerNumber)
 	{
 		Book[] libBooks = library.getBooks();
 		Reader[] libReaders = library.getReaders();
