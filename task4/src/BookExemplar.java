@@ -12,7 +12,7 @@ public class BookExemplar extends BookType {
 
     public BookExemplar(int id, Calendar dateOfAddition,
 	    Calendar dateOfPublication, String name, String author,
-	    double price, boolean inStore) {
+	    double price) {
 	super(name, author, price);
 	this.id = id;
 	this.dateOfAddition = dateOfAddition;
@@ -20,28 +20,17 @@ public class BookExemplar extends BookType {
 	Calendar c = Calendar.getInstance();
 
 	int currentMonth = c.get(Calendar.MONTH);
+	int currentYear = c.get(Calendar.YEAR);
 
 	int additionMonth = this.getDateOfAddition().get(Calendar.MONTH);
-
-	boolean condition = (currentMonth - additionMonth) > 6;
+	int additionYear = this.getDateOfAddition().get(Calendar.YEAR);
+	boolean condition = ((currentMonth + currentYear * 12) - (additionMonth + additionYear * 12)) > 6;
 
 	if (condition) {
 	    this.unclaimed = true;
 	} else {
 	    this.unclaimed = false;
 	}
-    }
-
-    public Calendar getDateOfAddition() {
-	return dateOfAddition;
-    }
-
-    public Calendar getDateOfPublication() {
-	return dateOfPublication;
-    }
-
-    public int getId() {
-	return id;
     }
 
     @Override
@@ -51,10 +40,10 @@ public class BookExemplar extends BookType {
 	sb.append(id);
 	sb.append(" | ");
 	sb.append("'");
-	sb.append(name);
+	sb.append(getName());
 	sb.append("'");
 	sb.append(", ");
-	sb.append(author);
+	sb.append(getAuthor());
 	sb.append(" | ");
 	sb.append("date of addition: ");
 	sb.append(dateOfAddition.getTime().toString());
@@ -63,17 +52,40 @@ public class BookExemplar extends BookType {
 	sb.append(dateOfPublication.getTime().toString());
 	sb.append(" | ");
 	sb.append("price: ");
-	sb.append(Double.toString(price));
+	sb.append(Double.toString(getPrice()));
 	sb.append("$");
 	return sb.toString();
     }
 
-    public boolean isUnclaimed() {
-	return unclaimed;
+    public Calendar getDateOfAddition() {
+	return dateOfAddition;
     }
 
     public void setDateOfAddition(Calendar dateOfAddition) {
 	this.dateOfAddition = dateOfAddition;
     }
 
+    public Calendar getDateOfPublication() {
+	return dateOfPublication;
+    }
+
+    public void setDateOfPublication(Calendar dateOfPublication) {
+	this.dateOfPublication = dateOfPublication;
+    }
+
+    public int getId() {
+	return id;
+    }
+
+    public void setId(int id) {
+	this.id = id;
+    }
+
+    public boolean isUnclaimed() {
+	return unclaimed;
+    }
+
+    public void setUnclaimed(boolean unclaimed) {
+	this.unclaimed = unclaimed;
+    }
 }

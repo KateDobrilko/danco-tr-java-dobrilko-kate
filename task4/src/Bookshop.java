@@ -3,13 +3,16 @@ public class Bookshop {
     private Cashier cashier;
     private OrderingSystem orderingSystem;
     private ReplySystem replySystem;
+    private CustomerBase customerBase;
+    
 
     public Bookshop(Store store, Cashier cashier,
-	    OrderingSystem orderingSystem, ReplySystem replySystem) {
+	    OrderingSystem orderingSystem, ReplySystem replySystem, CustomerBase customerBase) {
 	this.store = store;
 	this.cashier = cashier;
 	this.orderingSystem = orderingSystem;
 	this.replySystem = replySystem;
+	this.customerBase = customerBase;
     }
 
     public Store getStore() {
@@ -27,5 +30,11 @@ public class Bookshop {
     public ReplySystem getReplySystem() {
 	return replySystem;
     }
+
+    public CustomerBase getCustomerBase() {
+	return customerBase;
+    }
+
+    
 
 }
