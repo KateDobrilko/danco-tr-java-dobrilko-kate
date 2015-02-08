@@ -1,31 +1,34 @@
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Order {
-    private String id;
-    private ArrayList<BookExemplar> books;
-    private Date date;
+    private int id;
+    private ArrayList<BookType> books = new ArrayList<BookType>();
+    private Calendar date;
     private boolean executed;
     private Customer customer;
 
-    public Order(String id, ArrayList<BookExemplar> books, Date date,
+    public Order(int id, ArrayList<BookType> bookOrder, Calendar date,
 	    Customer customer) {
 	this.id = id;
-	this.books = books;
+	this.books = bookOrder;
 	this.date = date;
 	this.customer = customer;
 	this.setExecuted(false);
     }
 
-    public String getId() {
+    public int getId() {
 	return id;
     }
 
-    public ArrayList<BookExemplar> getBooks() {
+    public ArrayList<BookType> getBookOrder() {
 	return books;
     }
+    
+    
 
-    public Date getDate() {
+    public Calendar getDate() {
 	return date;
     }
 
@@ -50,8 +53,11 @@ public class Order {
 	sb.append("customer: ");
 	sb.append(customer.toString());
 	sb.append(" | ");
-	books.forEach((BookExemplar value) -> sb.append(value.toString()
-		+ System.lineSeparator()));
+	for(BookType bookType: books){
+	    sb.append(bookType.toString() + System.lineSeparator());
+	    if(bookType instanceof BookExemplar){sb.append(((BookExemplar)bookType).toString() + System.lineSeparator());}
+	}
+	
 	sb.append("customer: ");
 	sb.append(date.toString());
 	sb.append(" | ");

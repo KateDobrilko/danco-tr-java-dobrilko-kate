@@ -8,7 +8,7 @@ public class Store {
     private Map<BookType, ArrayList<BookExemplar>> books = new HashMap<BookType, ArrayList<BookExemplar>>();
 
     public Store() {
-
+	
     }
 
     public Store(Map<BookType, ArrayList<BookExemplar>> books) {
@@ -95,17 +95,24 @@ public class Store {
 	BookType bt = new BookType();
 	ArrayList<BookExemplar> be;
 	for (BookType book : books.keySet()) {
+	    if(book!= null){
 	    if ((book.getName().equals(bookExemplar.getName()))
 		    && (book.getAuthor().equals(bookExemplar.getAuthor()))
 		    && (book.getPrice() == bookExemplar.getPrice())) {
 		bt = book;
 	    }
+	    if(book.equals(null)){
+	    this.addBookType(new BookType(bookExemplar.getName(),bookExemplar.getAuthor(), bookExemplar.getPrice()));
+	    }}
 	}
 	be = books.get(bt);
 	books.remove(bt);
 	bt.setInStore(true);
 	bookExemplar.setDateOfAddition(Calendar.getInstance());
+	if(be!=null){}
+	else{be = new ArrayList<BookExemplar>();
 	be.add(bookExemplar);
+	}
 	books.put(bt, be);
     }
 
