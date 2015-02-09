@@ -1,3 +1,4 @@
+package com.danco.training.dobrilko.model;
 import java.util.Calendar;
 
 public class BookExemplar extends BookType {
@@ -11,8 +12,7 @@ public class BookExemplar extends BookType {
     }
 
     public BookExemplar(int id, Calendar dateOfAddition,
-	    Calendar dateOfPublication, String name, String author,
-	    double price) {
+	    Calendar dateOfPublication, String name, String author, double price) {
 	super(name, author, price);
 	this.id = id;
 	this.dateOfAddition = dateOfAddition;
@@ -36,24 +36,27 @@ public class BookExemplar extends BookType {
     @Override
     public String toString() {
 	StringBuilder sb = new StringBuilder();
-	sb.append("#");
+
+	sb.append("BookExemplar|");
 	sb.append(id);
-	sb.append(" | ");
-	sb.append("'");
+	sb.append("|");
 	sb.append(getName());
-	sb.append("'");
-	sb.append(", ");
+	sb.append("|");
 	sb.append(getAuthor());
-	sb.append(" | ");
-	sb.append("date of addition: ");
-	sb.append(dateOfAddition.getTime().toString());
-	sb.append(" | ");
-	sb.append("date of publication: ");
-	sb.append(dateOfPublication.getTime().toString());
-	sb.append(" | ");
-	sb.append("price: ");
+	sb.append("|");
+	
+	sb.append(Integer.toString(dateOfAddition.get(Calendar.YEAR)) + "/"
+		+ Integer.toString(dateOfAddition.get(Calendar.MONTH)) + "/"
+		+ Integer.toString(dateOfAddition.get(Calendar.DATE)));
+	sb.append("|");
+	
+	sb.append(Integer.toString(dateOfPublication.get(Calendar.YEAR)) + "/"
+		+ Integer.toString(dateOfPublication.get(Calendar.MONTH)) + "/"
+		+ Integer.toString(dateOfPublication.get(Calendar.DATE)));
+	sb.append("|");
+	
 	sb.append(Double.toString(getPrice()));
-	sb.append("$");
+	
 	return sb.toString();
     }
 

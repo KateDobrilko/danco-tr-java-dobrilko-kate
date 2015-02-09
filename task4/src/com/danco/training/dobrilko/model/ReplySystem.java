@@ -1,4 +1,8 @@
+package com.danco.training.dobrilko.model;
 import java.util.ArrayList;
+
+import com.danco.training.dobrilko.comparator.ReplyAlphabetComparator;
+import com.danco.training.dobrilko.comparator.ReplyNumberComparator;
 
 public class ReplySystem {
     private ArrayList<Reply> replies = new ArrayList<Reply>();
@@ -25,8 +29,17 @@ public class ReplySystem {
 	
     }
 
+    public void sortByAlphabet(){
+	replies.sort(new ReplyAlphabetComparator());
+    }
+    
+    public void sortByNumber(){
+	replies.sort(new ReplyNumberComparator());
+    }
+    
     public String toString() {
 	StringBuilder sb = new StringBuilder();
+	sb.append("ReplySystem "+System.lineSeparator()+replies.size()+System.lineSeparator());
 	for (Reply reply : replies) {
 	    sb.append(reply.toString() + System.lineSeparator());
 	}

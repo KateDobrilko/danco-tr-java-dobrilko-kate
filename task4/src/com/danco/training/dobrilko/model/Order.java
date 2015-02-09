@@ -1,3 +1,5 @@
+package com.danco.training.dobrilko.model;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,11 +24,17 @@ public class Order {
 	return id;
     }
 
+    public double getSum() {
+	double sum = 0;
+	for (BookType book : books) {
+	    sum += book.getPrice();
+	}
+	return sum;
+    }
+
     public ArrayList<BookType> getBookOrder() {
 	return books;
     }
-    
-    
 
     public Calendar getDate() {
 	return date;
@@ -47,22 +55,30 @@ public class Order {
     public String toString() {
 	StringBuilder sb = new StringBuilder();
 
-	sb.append("#");
 	sb.append(id);
-	sb.append(" | ");
-	sb.append("customer: ");
+	sb.append(System.lineSeparator());
 	sb.append(customer.toString());
-	sb.append(" | ");
-	for(BookType bookType: books){
-	    sb.append(bookType.toString() + System.lineSeparator());
-	    if(bookType instanceof BookExemplar){sb.append(((BookExemplar)bookType).toString() + System.lineSeparator());}
-	}
-	
-	sb.append("customer: ");
-	sb.append(date.toString());
-	sb.append(" | ");
-	sb.append("executed: ");
+	sb.append(System.lineSeparator());
+	sb.append(Integer.toString(date.get(Calendar.YEAR)) + "/"
+		+ Integer.toString(date.get(Calendar.MONTH)) + "/"
+		+ Integer.toString(date.get(Calendar.DATE)));
+
+	sb.append(System.lineSeparator());
+
 	sb.append(Boolean.toString(executed));
+	sb.append(System.lineSeparator());
+	sb.append(books.size());
+
+	sb.append(System.lineSeparator());
+
+	for (BookType bookType : books) {
+	    sb.append(bookType.toString() + System.lineSeparator());
+	    if (bookType instanceof BookExemplar) {
+		sb.append(((BookExemplar) bookType).toString()
+			+ System.lineSeparator());
+	    }
+	}
+
 	return sb.toString();
     }
 

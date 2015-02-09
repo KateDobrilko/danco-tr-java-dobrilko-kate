@@ -1,3 +1,6 @@
+package com.danco.training.dobrilko.model;
+
+
 public class Customer {
     private Order currentOrder;
     private int id;
@@ -43,6 +46,12 @@ public class Customer {
 
     public int getId() {
 	return id;
+    }
+    
+    public String toString(){
+	StringBuilder sb = new StringBuilder();
+	sb.append(id);
+	return sb.toString();
     }
 
 }

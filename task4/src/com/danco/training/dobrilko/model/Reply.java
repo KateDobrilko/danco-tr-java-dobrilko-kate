@@ -1,3 +1,6 @@
+package com.danco.training.dobrilko.model;
+
+
 public class Reply {
     private BookType bookType;
 
@@ -30,9 +33,9 @@ public class Reply {
 
     public String toString() {
 	StringBuilder sb = new StringBuilder();
-
+        sb.append("Reply"+System.lineSeparator());
 	sb.append(bookType.toString());
-	sb.append("number: ");
+	sb.append("|");
 	sb.append(numberOfRequests);
 
 	return sb.toString();
