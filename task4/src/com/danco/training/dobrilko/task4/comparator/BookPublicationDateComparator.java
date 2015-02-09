@@ -1,7 +1,7 @@
-package com.danco.training.dobrilko.comparator;
+package com.danco.training.dobrilko.task4.comparator;
 import java.util.Comparator;
 
-import com.danco.training.dobrilko.model.BookExemplar;
+import com.danco.training.dobrilko.task4.model.BookExemplar;
 
 public class BookPublicationDateComparator implements Comparator<BookExemplar> {
 
