@@ -1,7 +1,8 @@
+package com.danco.training.dobrilko.model;
 import java.util.ArrayList;
 
 public class CustomerBase {
-    private ArrayList<Customer> customers;
+    private ArrayList<Customer> customers = new ArrayList<Customer>();
 
     public ArrayList<Customer> getCustomers() {
 	return customers;
@@ -21,6 +22,16 @@ public class CustomerBase {
 
     public void deleteCustomer(Customer customer) {
 	customers.remove(customer);
+    }
+    
+    public String toString(){
+      StringBuilder sb = new StringBuilder();
+      sb.append("CustomerBase "+System.lineSeparator()+customers.size()+System.lineSeparator());
+      for(Customer customer: customers){
+      sb.append(customer.toString() + System.lineSeparator());
+      
+      }
+      return sb.toString();
     }
 
 }

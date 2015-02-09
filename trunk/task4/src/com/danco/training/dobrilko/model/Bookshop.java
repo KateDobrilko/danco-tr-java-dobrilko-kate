@@ -1,3 +1,6 @@
+package com.danco.training.dobrilko.model;
+
+
 public class Bookshop {
     private Store store;
     private Cashier cashier;
@@ -33,6 +36,18 @@ public class Bookshop {
 
     public CustomerBase getCustomerBase() {
 	return customerBase;
+    }
+    
+    public String toString()
+    {
+	StringBuilder sb = new StringBuilder();
+	sb.append(orderingSystem.toString()+System.lineSeparator());
+	sb.append(replySystem.toString()+System.lineSeparator());
+	sb.append(store.showExemplars()+System.lineSeparator());
+	sb.append(cashier.toString()+System.lineSeparator());
+	sb.append(customerBase.toString()+System.lineSeparator());
+	return sb.toString();
+	
     }
 
     

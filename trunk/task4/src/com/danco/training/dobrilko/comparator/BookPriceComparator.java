@@ -1,4 +1,7 @@
+package com.danco.training.dobrilko.comparator;
 import java.util.Comparator;
+
+import com.danco.training.dobrilko.model.BookType;
 
 public class BookPriceComparator implements Comparator<BookType> {
 

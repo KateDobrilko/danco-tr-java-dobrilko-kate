@@ -1,0 +1,35 @@
+OrderingSystem 
+2
+12345
+454654
+2014/3/21
+false
+1
+BookType|Chronicles of Brothers|Wendy Alec|5.6
+
+15454
+4545654
+2014/5/20
+false
+1
+BookType|Chronicles of Brothers|Wendy Alec|5.6
+
+
+ReplySystem 
+1
+Reply
+BookType|Cold Tom|Sally Prue|12.4|0
+
+Store 
+3
+BookExemplar|123|The Artefacts of Power|Maggie Furey|2015/1/9|1995/4/21|12.3
+BookExemplar|156|Coraline|Neil Gaiman|2015/1/9|1999/5/11|6.8
+BookExemplar|111|Arafel|C. J. Cherryh|2015/1/9|1998/4/11|5.3
+
+Cashier 
+1234.2
+CustomerBase 
+1
+56546
+
+

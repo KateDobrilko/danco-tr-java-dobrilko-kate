@@ -1,3 +1,4 @@
+package com.danco.training.dobrilko.model;
 
 public class BookType {
 
@@ -55,15 +56,12 @@ public class BookType {
     public String toString() {
 	StringBuilder sb = new StringBuilder();
 
-	sb.append("'");
+	sb.append("BookType|");
 	sb.append(name);
-	sb.append("'");
-	sb.append(", ");
+	sb.append("|");
 	sb.append(author);
-	sb.append(" | ");
-	sb.append("price: ");
+	sb.append("|");
 	sb.append(Double.toString(price));
-	sb.append("$");
 	return sb.toString();
     }
 

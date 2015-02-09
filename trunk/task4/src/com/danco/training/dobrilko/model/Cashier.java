@@ -1,3 +1,4 @@
+package com.danco.training.dobrilko.model;
 public class Cashier {
     private double commonSum;
 
@@ -18,7 +19,10 @@ public class Cashier {
 
     @Override
     public String toString() {
-	return Double.toString(commonSum);
+	StringBuilder sb = new StringBuilder();
+	sb.append("Cashier "+System.lineSeparator());
+	sb.append( Double.toString(commonSum));
+	return sb.toString();
     }
 
 }
