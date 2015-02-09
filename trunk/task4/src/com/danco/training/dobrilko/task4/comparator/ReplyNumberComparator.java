@@ -1,9 +1,10 @@
-package com.danco.training.dobrilko.comparator;
+package com.danco.training.dobrilko.task4.comparator;
 
 import java.util.Comparator;
 
 
-import com.danco.training.dobrilko.model.Reply;
+
+import com.danco.training.dobrilko.task4.model.Reply;
 
 public class ReplyNumberComparator implements Comparator<Reply> {
     public int compare(Reply a, Reply b) {
