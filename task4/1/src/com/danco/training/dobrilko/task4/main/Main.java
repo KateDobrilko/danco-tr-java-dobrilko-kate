@@ -17,9 +17,9 @@ import com.danco.training.dobrilko.task4.service.Store;
 
 public class Main {
     public static void main(String[] args) {
-	final String ORDERING_SYSTEM_PATH_READ = "src\\OrderingSystem.txt";
-	final String REPLY_SYSTEM_PATH_READ = "src\\ReplySystem.txt";
-	final String STORE_PATH_READ = "src\\Store.txt";
+	final String ORDERING_SYSTEM_PATH_READ = "OrderingSystem.txt";
+	final String REPLY_SYSTEM_PATH_READ = "ReplySystem.txt";
+	final String STORE_PATH_READ = "Store.txt";
 	final String ORDERING_SYSTEM_PATH_WRITE = "OrderingSystem.txt";
 	final String REPLY_SYSTEM_PATH_WRITE = "ReplySystem.txt";
 	final String STORE_PATH_WRITE = "Store.txt";

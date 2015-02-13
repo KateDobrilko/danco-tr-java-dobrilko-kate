@@ -3,4 +3,4 @@ Catch-22;Joseph Heller;13.5;6545;12;11;2010;21;8;2012;
 The Catcher in the Rye;J. D. Salinger;3.5;651654; ; ; ;21;8;2013;
 Beloved;Toni Morrison;2.4;656152;21;8;2011;21;9;2011;
 The Sound and the Fury;William Faulkner;8.5;2656451; ; ; ;21;8;2011;
-Little Prince;Exuperi;5.5;1254;11;11;2014;20;9;2013
+
