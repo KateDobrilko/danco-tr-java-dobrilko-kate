@@ -8,3 +8,4 @@ Beloved;Toni Morrison;2.4;656152; ; ; ;21;9;2011;
 The Great Gatsby;F. Scott Fitzgerald;13.2;165165; ; ; ;21;8;2011;
 The Grapes of Wrath;John Steinbeck;15.0;661656; ; ; ;21;8;2011;
 The Great Gatsby;F. Scott Fitzgerald;11.2;165167; ; ; ;20;7;2010;
+
