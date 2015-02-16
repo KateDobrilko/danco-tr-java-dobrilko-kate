@@ -1,0 +1,11 @@
+3
+9875156;2;27;10;2013;
+Ulysses;James Joyce;13.5;651654; ; ; ;21;8;2011;
+Lolita;Vladimir Nabokov;16.12;365464; ; ; ;2;9;2010;
+5451;1; ; ; ;
+Beloved;Toni Morrison;2.4;656152; ; ; ;21;9;2011;
+98475156;3;26;10;2013;
+The Great Gatsby;F. Scott Fitzgerald;13.2;165165; ; ; ;21;8;2011;
+The Grapes of Wrath;John Steinbeck;15.0;661656; ; ; ;21;8;2011;
+The Great Gatsby;F. Scott Fitzgerald;11.2;165167; ; ; ;20;7;2010;
+
