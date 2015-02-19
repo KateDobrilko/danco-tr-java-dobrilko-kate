@@ -1,5 +1,0 @@
-3
-Lolita;Vladimir Nabokov;16.12;365464; ; ; ;2;9;2010;3;
-To Kill a Mockingbird;by Harper Lee;7.8;35421; ; ; ;7;10;2012;1;
-The Lord of the Rings;J. R. R. Tolkien;10.5;54612; ; ; ;10;11;2014;5;
-
