@@ -6,9 +6,9 @@ import com.danco.training.dobrilko.bookshop.model.Book;
 
 public class BookPriceComparator implements Comparator<Book> {
 
-    public int compare(Book a, Book b) {
+	public int compare(Book a, Book b) {
 
-	return ((Double) a.getPrice()).compareTo(((Double) b.getPrice()));
-    }
+		return ((Double) a.getPrice()).compareTo(((Double) b.getPrice()));
+	}
 
 }

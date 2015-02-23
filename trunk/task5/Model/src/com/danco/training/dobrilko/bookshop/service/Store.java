@@ -14,117 +14,102 @@ import com.danco.training.dobrilko.bookshop.model.Book;
 import com.danco.training.dobrilko.bookshop.model.Reply;
 
 public class Store {
-    Logger logger = Logger.getLogger(Store.class);
-    private ArrayList<Book> books = new ArrayList<Book>();
+	Logger logger = Logger.getLogger(Store.class);
+	private ArrayList<Book> books = new ArrayList<Book>();
 
-    public void sortByName() {
+	public void sortByName() {
 
-	Collections.sort(books, new BookNameComparator());
+		Collections.sort(books, new BookNameComparator());
 
-    }
-
-    public void sortByInStore() {
-
-	Collections.sort(books, new BookInStoreComparator());
-
-    }
-
-    public void sortByPrice() {
-
-	Collections.sort(books, new BookPriceComparator());
-
-    }
-
-    public void sortByPublicationDate() {
-
-	Collections.sort(books, new BookPublicationDateComparator());
-
-    }
-
-    public ArrayList<Book> getBooks() {
-	return books;
-    }
-
-    public void setBooks(ArrayList<Book> books, ReplySystem replyS) {
-	if (!replyS.equals(null)) {
-	    books.forEach((Book book) -> addBook(book, replyS));
 	}
-    }
 
-    public void deleteBook(int id) {
-	Book book = null;
-	boolean condition = false;
-	for (Book b : books) {
-	    if (b.getId() == id) {
-		condition = true;
-		book = b;
-		break;
-	    }
-	}
-	if (condition) {
-	    books.removeIf((Book b) -> b.getId() == id);
-	}
-	if (book == null) {
-	    logger.warn("Book with id:" + Integer.toString(id)
-		    + " doesn't exists.");
-	}
-    }
+	public void sortByInStore() {
 
-    public void setBooks(ArrayList<Book> books) {
-	this.books = books;
-    }
+		Collections.sort(books, new BookInStoreComparator());
 
-    public void addBook(Book book, ReplySystem replySystem) {
-	if (!replySystem.equals(null)) {
-	    if (book.isInStore() == false) {
-		if (books.contains(book) == false) {
-		    books.add(book);
+	}
+
+	public void sortByPrice() {
+
+		Collections.sort(books, new BookPriceComparator());
+
+	}
+
+	public void sortByPublicationDate() {
+
+		Collections.sort(books, new BookPublicationDateComparator());
+
+	}
+
+	public ArrayList<Book> getBooks() {
+		return books;
+	}
+
+	public void setBooks(ArrayList<Book> books, ReplySystem replyS) {
+		if (!replyS.equals(null)) {
+			books.forEach((Book book) -> addBook(book, replyS));
 		}
-	    } else {
-		books.add(book);
-	    }
-	    for (Reply reply : replySystem.getReplies()) {
+	}
 
-		boolean condition = (reply.getBook().getAuthor().equals(book
-			.getAuthor()))
-			&& ((reply.getBook().getName().equals(book.getName())))
-			&& ((reply.getBook().getPrice() == book.getPrice()))
-			&& ((reply.getBook().getDateOfPublication()
-				.get(Calendar.YEAR)) == (book
-				.getDateOfPublication().get(Calendar.YEAR)))
-			&& ((reply.getBook().getDateOfPublication()
-				.get(Calendar.MONTH)) == (book
-				.getDateOfPublication().get(Calendar.MONTH)))
-			&& ((reply.getBook().getDateOfPublication()
-				.get(Calendar.DATE)) == (book
-				.getDateOfPublication().get(Calendar.DATE)))
-			&& (book.isInStore());
+	public void deleteBook(int id) {
+		Book book = null;
+		boolean condition = false;
+		for (Book b : books) {
+			if (b.getId() == id) {
+				condition = true;
+				book = b;
+				break;
+			}
+		}
 		if (condition) {
-
-		    reply.setExecuted(true);
-		    ;
-
+			books.removeIf((Book b) -> b.getId() == id);
 		}
-	    }
+		if (book == null) {
+			logger.warn("Book with id:" + Integer.toString(id) + " doesn't exists.");
+		}
 	}
-    }
 
-    public ArrayList<Book> getUnclaimedBooks() {
-	ArrayList<Book> unclaimedBooks = new ArrayList<Book>();
-	for (Book book : books) {
-	    if (book.isUnclaimed()) {
-		unclaimedBooks.add(book);
-	    }
+	public void setBooks(ArrayList<Book> books) {
+		this.books = books;
 	}
-	return unclaimedBooks;
-    }
 
-    public String toString() {
-	StringBuilder sb = new StringBuilder();
-	sb.append(Integer.toString(books.size()));
-	sb.append(System.lineSeparator());
-	books.forEach((Book book) -> sb.append(book.toString()
-		+ System.lineSeparator()));
-	return sb.toString();
-    }
+	public void addBook(Book book, ReplySystem replySystem) {
+		if (!replySystem.equals(null)) {
+			if (book.isInStore() == false) {
+				if (books.contains(book) == false) {
+					books.add(book);
+				}
+			} else {
+				books.add(book);
+			}
+			for (Reply reply : replySystem.getReplies()) {
+
+				boolean condition = (reply.getBook().getAuthor().equals(book.getAuthor())) && ((reply.getBook().getName().equals(book.getName()))) && ((reply.getBook().getPrice() == book.getPrice())) && ((reply.getBook().getDateOfPublication().get(Calendar.YEAR)) == (book.getDateOfPublication().get(Calendar.YEAR))) && ((reply.getBook().getDateOfPublication().get(Calendar.MONTH)) == (book.getDateOfPublication().get(Calendar.MONTH))) && ((reply.getBook().getDateOfPublication().get(Calendar.DATE)) == (book.getDateOfPublication().get(Calendar.DATE))) && (book.isInStore());
+				if (condition) {
+
+					reply.setExecuted(true);
+					;
+
+				}
+			}
+		}
+	}
+
+	public ArrayList<Book> getUnclaimedBooks() {
+		ArrayList<Book> unclaimedBooks = new ArrayList<Book>();
+		for (Book book : books) {
+			if (book.isUnclaimed()) {
+				unclaimedBooks.add(book);
+			}
+		}
+		return unclaimedBooks;
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(Integer.toString(books.size()));
+		sb.append(System.lineSeparator());
+		books.forEach((Book book) -> sb.append(book.toString() + System.lineSeparator()));
+		return sb.toString();
+	}
 }

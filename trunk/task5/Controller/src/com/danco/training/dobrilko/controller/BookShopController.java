@@ -12,151 +12,140 @@ import com.danco.training.dobrilko.bookshop.service.ReplySystem;
 import com.danco.training.dobrilko.bookshop.service.Store;
 
 public class BookShopController {
-    private BookShop bs = new BookShop();
+	private static BookShop instance;
 
-    public void readFromFile  (String SPath, String OSPath, String RSPath) throws IllegalArgumentException {
-	Parser parser = new Parser();
-	OrderingSystem os = parser.OSReadFromFile(OSPath);
-	ReplySystem rs = parser.RSReadFromFile(RSPath);
-	Store s = parser.SReadFromFile(SPath, rs);
-	bs = new BookShop(s, os, rs);}
-	
+	public static BookShop getInstance() {
+		return instance;
+	}
 
+	public static void readFromFile(String SPath, String OSPath, String RSPath) throws IllegalArgumentException {
+		Parser parser = new Parser();
+		OrderingSystem os = parser.OSReadFromFile(OSPath);
+		ReplySystem rs = parser.RSReadFromFile(RSPath);
+		Store s = parser.SReadFromFile(SPath, rs);
+		instance = new BookShop(s, os, rs);
+	}
 
-    public void writeToFile(String SPath, String OSPath, String RSPath) throws IllegalArgumentException{
-	Parser parser = new Parser();
-	parser.WriteToFile(bs.getOrderingSystem(), OSPath);
-	parser.WriteToFile(bs.getStore(), SPath);
-	parser.WriteToFile(bs.getReplySystem(), RSPath);
-    }
+	public static void writeToFile(String SPath, String OSPath, String RSPath) throws IllegalArgumentException {
+		Parser parser = new Parser();
+		parser.WriteToFile(getInstance().getOrderingSystem(), OSPath);
+		parser.WriteToFile(getInstance().getStore(), SPath);
+		parser.WriteToFile(getInstance().getReplySystem(), RSPath);
+	}
 
-    public void addOrder(Order order) {
-	bs.getOrderingSystem().addOrder(order);
-    }
+	public static void addOrder(Order order) {
+		getInstance().getOrderingSystem().addOrder(order);
+	}
 
-    public void cancelOrder(int id) {
-	bs.getOrderingSystem().cancelOrder(id);
-    }
+	public static void cancelOrder(int id) {
+		getInstance().getOrderingSystem().cancelOrder(id);
+	}
 
-    public void executeOrder(int id) {
-	bs.getOrderingSystem().executeOrder(id, bs.getStore());
-    }
+	public static void executeOrder(int id) {
+		getInstance().getOrderingSystem().executeOrder(id, getInstance().getStore());
+	}
 
-    public String showOrders() {
-	return bs.getOrderingSystem().toString();
-    }
+	public static String showOrders() {
+		return getInstance().getOrderingSystem().toString();
+	}
 
-    public String showReplies() {
-	return bs.getReplySystem().toString();
-    }
+	public static String showReplies() {
+		return getInstance().getReplySystem().toString();
+	}
 
-    public String showStore() {
-	return bs.getStore().toString();
-    }
+	public static String showStore() {
+		return getInstance().getStore().toString();
+	}
 
-    public String showSumOfExecutedOrders(int startYear, int startMonth,
-	    int endYear, int endMonth) {
-	return Double.toString(bs.getOrderingSystem().getSumOfExecutedOrders(
-		startYear, startMonth, endYear, endMonth));
-    }
+	public static String showSumOfExecutedOrders(int startYear, int startMonth, int endYear, int endMonth) {
+		return Double.toString(getInstance().getOrderingSystem().getSumOfExecutedOrders(startYear, startMonth, endYear, endMonth));
+	}
 
-    public String showExecutedOrders() {
-	StringBuilder sb = new StringBuilder();
+	public static String showExecutedOrders() {
+		StringBuilder sb = new StringBuilder();
+		getInstance().getOrderingSystem().getExecutedOrders().forEach((Order order) -> sb.append(order.toString() + System.lineSeparator()));
+		return sb.toString();
+	}
 
-	bs.getOrderingSystem()
-		.getExecutedOrders()
-		.forEach(
-			(Order order) -> sb.append(order.toString()
-				+ System.lineSeparator()));
-	return sb.toString();
-    }
+	public static String showNumberOfExecutedOrders(int startYear, int startMonth, int endYear, int endMonth) {
+		return Double.toString(getInstance().getOrderingSystem().getNumberOfExecutedOrders(startYear, startMonth, endYear, endMonth));
+	}
 
-    public String showNumberOfExecutedOrders(int startYear, int startMonth,
-	    int endYear, int endMonth) {
-	return Double.toString(bs.getOrderingSystem()
-		.getNumberOfExecutedOrders(startYear, startMonth, endYear,
-			endMonth));
-    }
+	public static void sortOrdersByDate() {
+		getInstance().getOrderingSystem().sortByDate();
 
-    public void sortOrdersByDate() {
-	bs.getOrderingSystem().sortByDate();
+	}
 
-    }
+	public static void sortOrdersByExecution() {
+		getInstance().getOrderingSystem().sortByExecution();
 
-    public void sortOrdersByExecution() {
-	bs.getOrderingSystem().sortByExecution();
+	}
 
-    }
+	public static void sortOrdersByPrice() {
+		getInstance().getOrderingSystem().sortByPrice();
 
-    public void sortOrdersByPrice() {
-	bs.getOrderingSystem().sortByPrice();
+	}
 
-    }
+	public static void addBook(Book book) {
 
-    public void addBook(Book book) {
+		getInstance().getStore().addBook(book, getInstance().getReplySystem());
 
-	bs.getStore().addBook(book, bs.getReplySystem());
+	}
 
-    }
+	public static void deleteBook(int id) {
 
-    public void deleteBook(int id) {
+		getInstance().getStore().deleteBook(id);
+	}
 
-	bs.getStore().deleteBook(id);
-    }
+	public static String showUnclaimedBooks() {
+		StringBuilder sb = new StringBuilder();
+		getInstance().getStore().getUnclaimedBooks().forEach((Book book) -> sb.append(book.toString() + System.lineSeparator()));
+		return sb.toString();
+	}
 
-    public String showUnclaimedBooks() {
-	StringBuilder sb = new StringBuilder();
-	bs.getStore()
-		.getUnclaimedBooks()
-		.forEach(
-			(Book book) -> sb.append(book.toString()
-				+ System.lineSeparator()));
-	return sb.toString();
-    }
+	public static void sortBookByPublicationDate() {
+		getInstance().getStore().sortByPublicationDate();
+	}
 
-    public void sortBookByPublicationDate() {
-	bs.getStore().sortByPublicationDate();
-    }
+	public static void sortBookByInStore() {
+		getInstance().getStore().sortByInStore();
+	}
 
-    public void sortBookByInStore() {
-	bs.getStore().sortByInStore();
-    }
+	public static void sortBookByName() {
+		getInstance().getStore().sortByName();
+	}
 
-    public void sortBookByName() {
-	bs.getStore().sortByName();
-    }
+	public static void sortBookByPrice() {
+		getInstance().getStore().sortByPrice();
+	}
 
-    public void sortBookByPrice() {
-	bs.getStore().sortByPrice();
-    }
+	public static void sortRepliesByAlphabet() {
+		getInstance().getReplySystem().sortByAlphabet();
+	}
 
-    public void sortRepliesByAlphabet() {
-	bs.getReplySystem().sortByAlphabet();
-    }
+	public static void sortRepliesByNumber() {
+		getInstance().getReplySystem().sortByNumber();
+	}
 
-    public void sortRepliesByNumber() {
-	bs.getReplySystem().sortByNumber();
-    }
+	public static void addReply(Reply reply) {
+		getInstance().getReplySystem().addReply(reply);
 
-    public void addReply(Reply reply) {
-	bs.getReplySystem().addReply(reply);
+	}
 
-    }
+	public static void executeReply(int id) {
+		getInstance().getReplySystem().executeReply(getInstance().getStore(), id);
+	}
 
-    public void executeReply(int id) {
-	bs.getReplySystem().executeReply(bs.getStore(), id);
-    }
+	public static void addBooks(ArrayList<Book> books) {
+		getInstance().getStore().setBooks(books, getInstance().getReplySystem());
+	}
 
-    public void addBooks(ArrayList<Book> books) {
-	bs.getStore().setBooks(books, bs.getReplySystem());
-    }
+	public static void addOrders(ArrayList<Order> orders) {
+		getInstance().getOrderingSystem().setOrders(orders);
+	}
 
-    public void addOrders(ArrayList<Order> orders) {
-	bs.getOrderingSystem().setOrders(orders);
-    }
-
-    public void addReplies(ArrayList<Reply> replies) {
-	bs.getReplySystem().setReplies(replies);
-    }
+	public static void addReplies(ArrayList<Reply> replies) {
+		getInstance().getReplySystem().setReplies(replies);
+	}
 
 }
