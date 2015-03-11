@@ -10,14 +10,20 @@ public class OrderBase implements Serializable {
 
 	private static final long serialVersionUID = -8789135438281397005L;
 	
+	private Order[] ordersArray = new Order[0];
 	private ArrayList<Order> orders;
 
 	public OrderBase() {
 		this.setOrders(new ArrayList<Order>());
+		ordersArray = new Order[orders.size()];
+		ordersArray = orders.toArray(ordersArray);
 	}
 
 	public OrderBase(ArrayList<Order> orders) {
 		this.setOrders(orders);
+		ordersArray = new Order[orders.size()];
+		ordersArray = orders.toArray(ordersArray);
+
 	}
 
 	public ArrayList<Order> getOrders() {
@@ -26,6 +32,7 @@ public class OrderBase implements Serializable {
 
 	public void setOrders(ArrayList<Order> orders) {
 		this.orders = orders;
+		orders.toArray(ordersArray);
 	}
 
 	public boolean add(Order order) {
@@ -43,6 +50,8 @@ public class OrderBase implements Serializable {
 				book.setOrdered(true);
 			}
 			this.orders.add(order);
+			ordersArray = new Order[orders.size()];
+			ordersArray = orders.toArray(ordersArray);
 		}
 
 		return idUnique;
@@ -58,6 +67,9 @@ public class OrderBase implements Serializable {
 		}
 		if (idUnique) {
 			this.orders.removeIf((Order order) -> order.getId() == id);
+			ordersArray = new Order[orders.size()];
+			ordersArray = orders.toArray(ordersArray);
+
 		}
 
 		return idUnique;
@@ -73,6 +85,9 @@ public class OrderBase implements Serializable {
 				break;
 			}
 		}
+		ordersArray = new Order[orders.size()];
+		ordersArray = orders.toArray(ordersArray);
+
 		return idMatches;
 	}
 
@@ -86,4 +101,9 @@ public class OrderBase implements Serializable {
 		}
 		return order;
 	}
+
+	public Order[] getOrdersArray() {
+		return ordersArray;
+	}
+
 }

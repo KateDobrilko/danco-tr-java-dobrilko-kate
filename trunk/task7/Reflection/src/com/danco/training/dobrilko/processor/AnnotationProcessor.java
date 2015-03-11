@@ -4,21 +4,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import com.danco.training.dobrilko.annotation.CSVCompositeList;
-import com.danco.training.dobrilko.annotation.CSVEntityList;
+import com.danco.training.dobrilko.annotation.CSVEntity;
 import com.danco.training.dobrilko.annotation.CSVNonCompositeObjectProperty;
 import com.danco.training.dobrilko.annotation.CSVPrimitiveProperty;
 import com.danco.training.dobrilko.comparator.CSVPrimitivePropertyPositionComparator;
+import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
 import com.danco.training.dobrilko.interfaceholder.HasId;
+import com.danco.training.dobrilko.reflectionproperty.PropertyStorage;
 
 public class AnnotationProcessor {
 	private static AnnotationProcessor instance;
-	
+
 	private AnnotationProcessor() {
-		
+
 	}
 
 	public static AnnotationProcessor getInstance() {
@@ -29,132 +31,218 @@ public class AnnotationProcessor {
 		return instance;
 
 	}
-	@SuppressWarnings("deprecation")
+
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	public void writeInFile(Object[] objects) throws IllegalArgumentException,
-			IOException, IllegalAccessException {
-		
-			CSVEntityList csvEntity = objects.getClass().getAnnotation(
-					CSVEntityList.class);
-		FileWriter writer = new FileWriter(csvEntity.fileName(), true);
+			IOException, IllegalAccessException, NoSuchFieldException,
+			SecurityException {
+
+		CSVEntity csvEntity = objects[0].getClass().getAnnotation(
+				CSVEntity.class);
+		String fileName="";
+		if(csvEntity.csvPath()==CSVFileReflectionPath.BookReflectionPath){
+			fileName = PropertyStorage.getInstance().getCSVBookReflectionFilePath();
+		}
+		if(csvEntity.csvPath()==CSVFileReflectionPath.OrderReflectionPath){
+			fileName = PropertyStorage.getInstance().getCSVOrderReflectionFilePath();
+		}
+		if(csvEntity.csvPath()==CSVFileReflectionPath.ReplyReflectionPath){
+			fileName = PropertyStorage.getInstance().getCSVReplyReflectionFilePath();
+		}
+		FileWriter writer = new FileWriter(fileName, true);
 		StringBuilder sb = new StringBuilder();
 		for (Object object : objects) {
-			
 
-				Field[] fields = object.getClass().getFields();
-				
-				CSVPrimitiveProperty[] cpp = object.getClass()
-						.getAnnotationsByType(CSVPrimitiveProperty.class);
-				Arrays.sort(cpp, new CSVPrimitivePropertyPositionComparator());
-				for (CSVPrimitiveProperty cp : cpp) {
-					for (Field field : fields) {
+			Field[] fields = object.getClass().getDeclaredFields();
+			ArrayList<CSVPrimitiveProperty> cpp = new ArrayList<CSVPrimitiveProperty>();
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(CSVPrimitiveProperty.class)) {
+					cpp.add(field.getAnnotation(CSVPrimitiveProperty.class));
+				}
+			}
+
+			Collections.sort(cpp, new CSVPrimitivePropertyPositionComparator());
+			for (CSVPrimitiveProperty cp : cpp) {
+				for (Field field : fields) {
+					if (field.isAnnotationPresent(CSVPrimitiveProperty.class)) {
 						if (field.getAnnotation(CSVPrimitiveProperty.class)
 								.equals(cp)) {
+
 							Class<?> type = field.getType();
-							if (type.equals(Integer.class)) {
+							if (type.equals(int.class)) {
+
 								Integer value = 0;
-								field.getInt(value);
+								Field newField = object.getClass()
+										.getDeclaredField(field.getName());
+								newField.setAccessible(true);
+								value = (Integer) newField.get(object);
 								sb.append(value);
+								sb.append(csvEntity.valuesSeparator());
 							}
-							if (type.equals(Double.class)) {
+							if (type.equals(double.class)) {
 								Double value = 0.0;
-								field.getDouble(value);
+								Field newField = object.getClass()
+										.getDeclaredField(field.getName());
+								newField.setAccessible(true);
+								value = (Double) newField.get(object);
+
 								sb.append(value);
 							}
 
-							if (type.equals(Boolean.class)) {
+							if (type.equals(boolean.class)) {
 								Boolean value = false;
-								field.getBoolean(value);
+								Field newField = object.getClass()
+										.getDeclaredField(field.getName());
+								newField.setAccessible(true);
+								value = (Boolean) newField.get(object);
 								sb.append(value);
+								sb.append(csvEntity.valuesSeparator());
 							}
 							if (type.equals(String.class)) {
 								String value = "";
-								field.get(value);
+								Field newField = object.getClass()
+										.getDeclaredField(field.getName());
+								newField.setAccessible(true);
+								value = (String) newField.get(object);
 								sb.append(value);
+								sb.append(csvEntity.valuesSeparator());
 							}
 							if (type.equals(Date.class)) {
 								Date value = new Date();
-								field.get(value);
-								sb.append(value.getDate()+";"+value.getMonth()+";"+value.getYear()+";");
+
+								Field newField = object.getClass()
+										.getDeclaredField(field.getName());
+								newField.setAccessible(true);
+								value = (Date) newField.get(object);
+
+								if (value == null) {
+
+								} else {
+									sb.append(value.getDate()
+											+ csvEntity.valuesSeparator()
+											+ value.getMonth()
+											+ csvEntity.valuesSeparator()
+											+ value.getYear()
+											+ csvEntity.valuesSeparator());
+								}
 							}
 
-							sb.append(csvEntity.valuesSeparator());
 						}
-						sb.append(System.lineSeparator());
+						
 					}
+					
 				}
-				for (Field field : fields) {
-					if (field.isAnnotationPresent(CSVCompositeList.class)) {
-						Class<?> type = field.getType();
-						if (type.equals(ArrayList.class)) {
+				sb.append(System.lineSeparator());
+				break;
+			}
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(CSVCompositeList.class)) {
+					Class<?> type = field.getType();
+					if (type.equals(ArrayList.class)) {
 
-							ArrayList<Object> list = new ArrayList<Object>();
-							field.get(list);
+						ArrayList<Object> value = new ArrayList<Object>();
+						Field newField = object.getClass().getDeclaredField(
+								field.getName());
+						newField.setAccessible(true);
+						value = (ArrayList<Object>) newField.get(object);
 
-							for (Object obj : list) {
-								if (obj instanceof HasId) {
-									sb.append(((HasId) obj).getId());
-									sb.append(csvEntity.valuesSeparator());
-								}
+						for (Object obj : value) {
+							if (obj instanceof HasId) {
+								sb.append(((HasId) obj).getId());
+								sb.append(csvEntity.valuesSeparator());
 							}
 						}
-						sb.append(System.lineSeparator());
 					}
+					sb.append(System.lineSeparator());
+				}
 
-					if (field
-							.isAnnotationPresent(CSVNonCompositeObjectProperty.class)) {
-						Class<?> type = field.getType();
-						fields = type.getFields();
-						cpp = type
-								.getAnnotationsByType(
-										CSVPrimitiveProperty.class);
-						Arrays.sort(cpp,
-								new CSVPrimitivePropertyPositionComparator());
-						for (CSVPrimitiveProperty cp : cpp) {
-							for (Field f : fields) {
-								if (field.getAnnotation(
-										CSVPrimitiveProperty.class).equals(cp)) {
-									Class<?> type1 = f.getType();
-									if (type1.equals(Integer.class)) {
-										Integer value = 0;
-										f.getInt(value);
-										sb.append(value);
-									}
-									if (type1.equals(Double.class)) {
-										Double value = 0.0;
-										f.getDouble(value);
-										sb.append(value);
-									}
+				if (field
+						.isAnnotationPresent(CSVNonCompositeObjectProperty.class)) {
+					Class<?> type = field.getType();
+					fields = type.getFields();
+					for (Field f : fields) {
+						if (f.isAnnotationPresent(CSVPrimitiveProperty.class)) {
+							cpp.add(f.getAnnotation(CSVPrimitiveProperty.class));
+						}
+					}
+					Collections.sort(cpp,
+							new CSVPrimitivePropertyPositionComparator());
+					for (CSVPrimitiveProperty cp : cpp) {
+						for (Field f : fields) {
+							if (field.getAnnotation(CSVPrimitiveProperty.class)
+									.equals(cp)) {
+								Class<?> type1 = f.getType();
+								if (type1.equals(Integer.class)) {
+									Integer value = 0;
+									Field newField = object.getClass()
+											.getDeclaredField(f.getName());
+									newField.setAccessible(true);
+									value = (Integer) newField.get(object);
 
-									if (type1.equals(Boolean.class)) {
-										Boolean value = false;
-										f.getBoolean(value);
-										sb.append(value);
-									}
-									if (type1.equals(String.class)) {
-										String value = "";
-										f.get(value);
-										sb.append(value);
-									}
-									if (type1.equals(Date.class)) {
-										Date value = new Date();
-										f.get(value);
-										sb.append(value.getDate()+";"+value.getMonth()+";"+value.getYear()+";");
-									}
+									sb.append(value);
+								}
+								if (type1.equals(Double.class)) {
+									Double value = 0.0;
 
+									Field newField = object.getClass()
+											.getDeclaredField(f.getName());
+									newField.setAccessible(true);
+									value = (Double) newField.get(object);
+
+									sb.append(value);
 									sb.append(csvEntity.valuesSeparator());
 								}
-								sb.append(System.lineSeparator());
-							}
-						}
 
+								if (type1.equals(Boolean.class)) {
+									Boolean value = false;
+									Field newField = object.getClass()
+											.getDeclaredField(f.getName());
+									newField.setAccessible(true);
+									value = (Boolean) newField.get(object);
+
+									sb.append(value);
+									sb.append(csvEntity.valuesSeparator());
+								}
+								if (type1.equals(String.class)) {
+									String value = "";
+									Field newField = object.getClass()
+											.getDeclaredField(f.getName());
+									newField.setAccessible(true);
+									value = (String) newField.get(object);
+									sb.append(value);
+								}
+								if (type1.equals(Date.class)) {
+									Date value = new Date();
+									Field newField = object.getClass()
+											.getDeclaredField(f.getName());
+									newField.setAccessible(true);
+									value = (Date) newField.get(object);
+									if (value == null) {
+
+									} else {
+										sb.append(value.getDate()
+												+ csvEntity.valuesSeparator()
+												+ value.getMonth()
+												+ csvEntity.valuesSeparator()
+												+ value.getYear()
+												+ csvEntity.valuesSeparator());
+									}
+									sb.append(csvEntity.valuesSeparator());
+								}
+
+								sb.append(csvEntity.valuesSeparator());
+							}
+							sb.append(System.lineSeparator());
+						}
 					}
 
 				}
 
 			}
-			writer.append(sb.toString());
-			writer.flush();
-			writer.close();
-		}
-	}
 
+		}
+		writer.append(sb.toString());
+		writer.flush();
+		writer.close();
+	}
+}

@@ -30,6 +30,7 @@ public class MenuCreator {
 		readAndWriteMenu.addMenuItem(new MenuItem(new ReadOrdersFromFileAction(), ConstantStorage.READ_ORDERS_FROM_FILE, mainMenu));
 		readAndWriteMenu.addMenuItem(new MenuItem(new ReadRepliesFromFileAction(), ConstantStorage.READ_REPLIES_FROM_FILE, mainMenu));
 		readAndWriteMenu.addMenuItem(new MenuItem(new ReadBooksFromFileAction(), ConstantStorage.READ_BOOKS_FROM_FILE, mainMenu));
+		readAndWriteMenu.addMenuItem(new MenuItem(new WriteOrdersInFileWithReflectionAction(), ConstantStorage.WRITE_ORDERS_IN_FILE_WITH_REFLECTION,mainMenu));
 		readAndWriteMenu.addMenuItem(new MenuItem(null, ConstantStorage.EXIT_RW,null));
 
 		orderingSystemMenu.addMenuItem(new MenuItem(new AddOrderAction(), ConstantStorage.ADD_ORDER, orderingSystemMenu));

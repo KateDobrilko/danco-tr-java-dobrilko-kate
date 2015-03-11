@@ -5,19 +5,22 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.danco.training.dobrilko.annotation.CSVCompositeList;
-import com.danco.training.dobrilko.annotation.CSVCompositeProperty;
+import com.danco.training.dobrilko.annotation.CSVEntity;
 import com.danco.training.dobrilko.annotation.CSVPrimitiveProperty;
+import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
 import com.danco.training.dobrilko.interfaceholder.HasId;
-
+@CSVEntity(csvPath = CSVFileReflectionPath.OrderReflectionPath)
 public class Order implements Serializable, Cloneable, HasId {
 	private static final long serialVersionUID = 8844590591157079914L;
-	@CSVCompositeProperty
+	@CSVPrimitiveProperty
 	private int id;
 	@CSVCompositeList
 	private ArrayList<Book> books = new ArrayList<Book>();
 	@CSVPrimitiveProperty
-	private Date dateOfExecution;
+    private int numberOfBooks;
 	@CSVPrimitiveProperty
+	private Date dateOfExecution;
+	
 	private boolean status; // true - in progress, false - executed
 
 	public Order() {
@@ -30,6 +33,7 @@ public class Order implements Serializable, Cloneable, HasId {
 		this.setBooks(books);
 		this.setDateOfExecution(dateOfExecution);
 		this.setStatus(true);
+		this.setNumberOfBooks(books.size());
 
 	}
 
@@ -42,11 +46,14 @@ public class Order implements Serializable, Cloneable, HasId {
 	}
 
 	public ArrayList<Book> getBooks() {
+		
 		return books;
+		
 	}
 
 	public void setBooks(ArrayList<Book> books) {
 		this.books = books;
+		this.setNumberOfBooks(books.size());
 	}
 
 	public Date getDateOfExecution() {
@@ -89,5 +96,13 @@ public class Order implements Serializable, Cloneable, HasId {
 		order.setStatus(this.getStatus());
 		return order;
 
+	}
+
+	public int getNumberOfBooks() {
+		return numberOfBooks;
+	}
+
+	public void setNumberOfBooks(int numberOfBooks) {
+		this.numberOfBooks = numberOfBooks;
 	}
 }

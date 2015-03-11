@@ -9,7 +9,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import com.danco.training.dobrilko.annotation.CSVEntityList;
 import com.danco.training.dobrilko.bookshop.Bookshop;
 import com.danco.training.dobrilko.comparator.BookNameComparator;
 import com.danco.training.dobrilko.comparator.BookPriceComparator;
@@ -28,13 +27,10 @@ import com.danco.training.dobrilko.other.SerializerUtil;
 import com.danco.training.dobrilko.processor.AnnotationProcessor;
 import com.danco.training.dobrilko.property.PropertyStorage;
 
-public class BookshopController {
-	public final static String PATH = PropertyStorage.getInstance()
-			.getCSVOrderFilePath();
-	@CSVEntityList(fileName = "src\\com\\danco\\training\\dobrilko\\txt\\Orders.csv")
-	
-	static Order[] orders;
 
+public class BookshopController {
+	
+	
 	public static void readOrdersFromFile(String csvPath)
 			throws IllegalArgumentException {
 		CSVImportExportUtil.ImportOrders(csvPath);
@@ -61,16 +57,21 @@ public class BookshopController {
 	}
 
 	public static void writeOrdersWithReflection() {
-
+		
+		
 		try {
-			if(Bookshop.getInstance().getOrderBase().getOrders().get(0) instanceof Order)
-			 {orders= (Order[]) Bookshop.getInstance().getOrderBase()
-						.getOrders().toArray();
-			AnnotationProcessor.getInstance().writeInFile(orders);}
+			
+			AnnotationProcessor.getInstance().writeInFile(Bookshop.getInstance().getOrderBase().getOrdersArray());
 		} catch (IllegalArgumentException | IllegalAccessException
 				| IOException e) {
 			Logger logger = Logger.getLogger(BookshopController.class);
 			logger.error("IO error detected!", e);
+		} catch (NoSuchFieldException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("NoSuchField error detected!", e);
+		} catch (SecurityException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("Security error detected!", e);
 		}
 	}
 
