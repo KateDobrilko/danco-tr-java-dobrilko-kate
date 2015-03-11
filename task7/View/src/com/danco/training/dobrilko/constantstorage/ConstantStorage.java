@@ -17,7 +17,8 @@ public class ConstantStorage {
 	public final static String READ_ORDERS_FROM_FILE = "Press 5 - Read orders from file";
 	public final static String READ_REPLIES_FROM_FILE = "Press 6 - Read replies from file";
 	public final static String READ_BOOKS_FROM_FILE = "Press 7 - Read books from file";
-	public final static String EXIT_RW = "Press 8 - Exit";
+	public final static String WRITE_ORDERS_IN_FILE_WITH_REFLECTION = "Press 8 - Write orders in file with reflection";
+	public final static String EXIT_RW = "Press 9 - Exit";
 
 	public final static String ADD_ORDER = "Press 0  - Add Order";
 	public final static String CANCEL_ORDER = "Press 1  - Cancel Order";
