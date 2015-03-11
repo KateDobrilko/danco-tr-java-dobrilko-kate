@@ -7,9 +7,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+
 import org.apache.log4j.Logger;
 
-import com.danco.training.bookshop.Bookshop;
+import com.danco.training.dobrilko.bookshop.Bookshop;
 import com.danco.training.dobrilko.entitiy.Book;
 import com.danco.training.dobrilko.entitiy.Order;
 import com.danco.training.dobrilko.entitiy.Reply;
@@ -297,18 +298,19 @@ public class CSVImportExportUtil {
 			}
 
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error("File Not Found. Check your input,", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IOException catched!");
 		} finally {
 			if (br != null) {
 				try {
 					br.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error("IOException catched!");
 				}
 			}
 		}
+
 		try {
 
 			int currentPointerPosition = 0;
@@ -397,15 +399,15 @@ public class CSVImportExportUtil {
 			}
 
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error("File Not Found. Check your input,", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IOException catched!");
 		} finally {
 			if (br != null) {
 				try {
 					br.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error("IOException catched!");
 				}
 			}
 		}
