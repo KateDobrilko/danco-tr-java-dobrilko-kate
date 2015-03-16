@@ -1,5 +1,5 @@
 package com.danco.training.dobrilko.enumeration;
 
 public enum CSVFileReflectionPath {
-	OrderReflectionPath, ReplyReflectionPath, BookReflectionPath
+	ORDER_REFLECTION_PATH, REPLY_REFLECTION_PATH, BOOK_REFLECTION_PATH
 }

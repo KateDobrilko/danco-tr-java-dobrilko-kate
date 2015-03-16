@@ -2,7 +2,7 @@ package com.danco.training.dobrilko.comparator;
 
 import java.util.Comparator;
 
-import com.danco.training.dobrilko.entitiy.Book;
+import com.danco.training.dobrilko.entity.Book;
 
 public class BookPriceComparator implements Comparator<Book> {
 

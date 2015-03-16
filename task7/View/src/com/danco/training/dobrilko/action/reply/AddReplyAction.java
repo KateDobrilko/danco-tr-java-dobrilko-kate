@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 
 import com.danco.training.dobrilko.action.IAction;
 import com.danco.training.dobrilko.controller.BookshopController;
-import com.danco.training.dobrilko.entitiy.Reply;
+import com.danco.training.dobrilko.entity.Reply;
 import com.danco.training.dobrilko.ioutil.SpecificIOFeaturesUtil;
 
 public class AddReplyAction implements IAction {

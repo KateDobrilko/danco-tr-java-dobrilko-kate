@@ -3,7 +3,9 @@ package com.danco.training.dobrilko.database;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.danco.training.dobrilko.entitiy.Reply;
+import com.danco.training.dobrilko.bookshop.Bookshop;
+import com.danco.training.dobrilko.entity.Book;
+import com.danco.training.dobrilko.entity.Reply;
 
 public class ReplyBase implements Serializable {
 
@@ -31,14 +33,36 @@ public class ReplyBase implements Serializable {
 		boolean idUnique = true;
 		for (Reply r : this.replies) {
 			if (r.getId() == reply.getId()) {
-				update(r.getId(), reply);
 				idUnique = false;
 				break;
 			}
 		}
-		if (idUnique) {
 
-			this.replies.add(reply);
+		if (idUnique) {
+			for (Book b : Bookshop.getInstance().getBookBase().getBooks()) {
+				if ((b.getId() == reply.getBook().getId())
+						&& (b.getDateOfAddition() == null)) {
+					reply.setBook(b);
+					boolean flag = false;
+					for (Reply r : this.replies) {
+						if (r.getBook().getId() == reply.getBook().getId()) {
+							r.setNumberOfRequests(r.getNumberOfRequests() + 1);
+							flag = true;
+							break;
+						}
+					}
+
+					if (flag == false) {
+						this.replies.add(reply);
+						break;
+					}
+
+				} else {
+					idUnique = false;
+				}
+
+			}
+
 		}
 
 		return idUnique;
@@ -81,5 +105,11 @@ public class ReplyBase implements Serializable {
 			}
 		}
 		return reply;
+	}
+
+	public Reply[] getRepliesArray() {
+		Reply[] repliesArray = new Reply[replies.size()];
+		repliesArray = replies.toArray(repliesArray);
+		return repliesArray;
 	}
 }

@@ -5,14 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.danco.training.dobrilko.enumeration.PropertyType;
-
+@Retention(value = RetentionPolicy.RUNTIME)
+@Target(value = ElementType.FIELD)
 public @interface CSVCompositeProperty {
 
-	@Target(value = ElementType.FIELD)
-	@Retention(value = RetentionPolicy.RUNTIME)
-	public @interface CSVProperty {
-		PropertyType propertyType = PropertyType.CompositeProperty;
-		int keyField = 0;
-	}
 }
