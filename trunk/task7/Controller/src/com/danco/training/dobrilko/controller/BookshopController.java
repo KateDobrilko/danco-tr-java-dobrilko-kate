@@ -1,6 +1,7 @@
 package com.danco.training.dobrilko.controller;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -19,49 +20,75 @@ import com.danco.training.dobrilko.comparator.OrderPriceComparator;
 import com.danco.training.dobrilko.comparator.ReplyAlphabetComparator;
 import com.danco.training.dobrilko.comparator.ReplyNumberComparator;
 import com.danco.training.dobrilko.database.OrderBase;
-import com.danco.training.dobrilko.entitiy.Book;
-import com.danco.training.dobrilko.entitiy.Order;
-import com.danco.training.dobrilko.entitiy.Reply;
-import com.danco.training.dobrilko.other.CSVImportExportUtil;
+import com.danco.training.dobrilko.entity.Book;
+import com.danco.training.dobrilko.entity.Order;
+import com.danco.training.dobrilko.entity.Reply;
 import com.danco.training.dobrilko.other.SerializerUtil;
 import com.danco.training.dobrilko.processor.AnnotationProcessor;
 import com.danco.training.dobrilko.property.PropertyStorage;
 
-
 public class BookshopController {
-	
-	
-	public static void readOrdersFromFile(String csvPath)
-			throws IllegalArgumentException {
-		CSVImportExportUtil.ImportOrders(csvPath);
+
+	public static void readOrdersFromFile() throws IllegalArgumentException {
+		try {
+			Object[] orders = AnnotationProcessor.getInstance().readFromFile(
+					Order.class);
+			for (Object order : orders) {
+				if (order instanceof Order)
+					Bookshop.getInstance().getOrderBase().add((Order) order);
+			}
+		} catch (IllegalAccessException | NoSuchFieldException
+				| SecurityException | NoSuchMethodException
+				| InstantiationException | InvocationTargetException
+				| IOException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("Error during reading orders from file!");
+		}
+
 	}
 
-	public static void readBooksFromFile(String csvPath)
-			throws IllegalArgumentException {
-		CSVImportExportUtil.ImportBooks(csvPath);
+	public static void readBooksFromFile() throws IllegalArgumentException {
+		try {
+			Object[] books = AnnotationProcessor.getInstance().readFromFile(
+					Book.class);
+			for (Object book : books) {
+				if (book instanceof Book) {
+					Bookshop.getInstance().getBookBase().add((Book) book);
+				}
+			}
+		} catch (IllegalAccessException | NoSuchFieldException
+				| SecurityException | NoSuchMethodException
+				| InstantiationException | InvocationTargetException
+				| IOException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("Error during reading books from file!");
+		}
 	}
 
-	public static void readRepliesFromFile(String csvPath)
-			throws IllegalArgumentException {
-		CSVImportExportUtil.ImportReplies(csvPath);
-	}
-
-	public static void writeBookToFile(String csvPath, Book book)
-			throws IllegalArgumentException {
-		CSVImportExportUtil.ExportBook(book, csvPath);
-	}
-
-	public static void writeOrderToFile(String csvPath, Order order)
-			throws IllegalArgumentException {
-		CSVImportExportUtil.ExportOrder(order, csvPath);
+	public static void readRepliesFromFile() throws IllegalArgumentException {
+		try {
+			Object[] replies = AnnotationProcessor.getInstance().readFromFile(
+					Reply.class);
+			for (Object reply : replies) {
+				if (reply instanceof Reply) {
+					Bookshop.getInstance().getReplyBase().add((Reply) reply);
+				}
+			}
+		} catch (IllegalAccessException | NoSuchFieldException
+				| SecurityException | NoSuchMethodException
+				| InstantiationException | InvocationTargetException
+				| IOException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("Error during reading replies from file!", e);
+		}
 	}
 
 	public static void writeOrdersWithReflection() {
-		
-		
+
 		try {
-			
-			AnnotationProcessor.getInstance().writeInFile(Bookshop.getInstance().getOrderBase().getOrdersArray());
+
+			AnnotationProcessor.getInstance().writeInFile(
+					Bookshop.getInstance().getOrderBase().getOrdersArray());
 		} catch (IllegalArgumentException | IllegalAccessException
 				| IOException e) {
 			Logger logger = Logger.getLogger(BookshopController.class);
@@ -75,9 +102,42 @@ public class BookshopController {
 		}
 	}
 
-	public static void writeReplyToFile(String csvPath, Reply reply)
-			throws IllegalArgumentException {
-		CSVImportExportUtil.ExportReply(reply, csvPath);
+	public static void writeRepliesWithReflection() {
+
+		try {
+
+			AnnotationProcessor.getInstance().writeInFile(
+					Bookshop.getInstance().getReplyBase().getRepliesArray());
+		} catch (IllegalArgumentException | IllegalAccessException
+				| IOException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("IO error detected!", e);
+		} catch (NoSuchFieldException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("NoSuchField error detected!", e);
+		} catch (SecurityException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("Security error detected!", e);
+		}
+	}
+
+	public static void writeBooksWithReflection() {
+
+		try {
+
+			AnnotationProcessor.getInstance().writeInFile(
+					Bookshop.getInstance().getBookBase().getBooksArray());
+		} catch (IllegalArgumentException | IllegalAccessException
+				| IOException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("IO error detected!", e);
+		} catch (NoSuchFieldException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("NoSuchField error detected!", e);
+		} catch (SecurityException e) {
+			Logger logger = Logger.getLogger(BookshopController.class);
+			logger.error("Security error detected!", e);
+		}
 	}
 
 	public static void readFromFile(String path) {
@@ -134,7 +194,9 @@ public class BookshopController {
 					for (Book bookBaseBook : Bookshop.getInstance()
 							.getBookBase().getBooks()) {
 						orderBook.setOrdered(true);
-						if (orderBook.getId() == bookBaseBook.getId()) {
+						if ((orderBook.getId() == bookBaseBook.getId())
+								&& (bookBaseBook.getDateOfAddition() != null)
+								&& (bookBaseBook.getNumberOfExemplars() != 0)) {
 
 							count++;
 
@@ -151,7 +213,9 @@ public class BookshopController {
 					for (Book orderBook : orderToExecute.getBooks()) {
 						for (Book bookBaseBook : Bookshop.getInstance()
 								.getBookBase().getBooks()) {
-							if (orderBook.getId() == bookBaseBook.getId()) {
+							if (orderBook.getId() == bookBaseBook.getId()
+									&& (bookBaseBook.getDateOfAddition() != null)
+									&& (bookBaseBook.getNumberOfExemplars() != 0)) {
 								bookBaseBook.setOrdered(false);
 								Bookshop.getInstance().getBookBase()
 										.delete(bookBaseBook.getId());
@@ -349,8 +413,9 @@ public class BookshopController {
 						.getAuthor()))
 						&& (reply.getBook().getName().equals(book.getName()))
 						&& (reply.getBook().getDateOfPublication().equals(book
-								.getDateOfPublication())) && (!book
-						.getDateOfAddition().equals(null)));
+								.getDateOfPublication()))
+						&& (!book.getDateOfAddition().equals(null)) && (!reply
+						.isExecuted()));
 				if (condition) {
 
 					reply.setBook(book);

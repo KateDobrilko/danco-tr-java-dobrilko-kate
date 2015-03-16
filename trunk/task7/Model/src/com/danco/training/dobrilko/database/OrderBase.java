@@ -3,8 +3,8 @@ package com.danco.training.dobrilko.database;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.danco.training.dobrilko.entitiy.Book;
-import com.danco.training.dobrilko.entitiy.Order;
+import com.danco.training.dobrilko.entity.Book;
+import com.danco.training.dobrilko.entity.Order;
 
 public class OrderBase implements Serializable {
 

@@ -10,7 +10,7 @@ import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
 @Target(value = ElementType.TYPE)
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface CSVEntity {	
-	CSVFileReflectionPath csvPath() default CSVFileReflectionPath.BookReflectionPath;
+	CSVFileReflectionPath csvPath() default CSVFileReflectionPath.BOOK_REFLECTION_PATH;
 	char valuesSeparator () default ';';
 	
 	

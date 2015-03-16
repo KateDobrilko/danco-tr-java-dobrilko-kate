@@ -24,13 +24,12 @@ public class MenuCreator {
 
 		readAndWriteMenu.addMenuItem(new MenuItem(new WriteToFileAction(), ConstantStorage.WRITE_TO_FILE, mainMenu));
 		readAndWriteMenu.addMenuItem(new MenuItem(new ReadFromFileAction(), ConstantStorage.READ_FROM_FILE, mainMenu));
-		readAndWriteMenu.addMenuItem(new MenuItem(new WriteBookInFileAction(), ConstantStorage.WRITE_BOOK_IN_FILE, mainMenu));
-		readAndWriteMenu.addMenuItem(new MenuItem(new WriteOrderInFileAction(), ConstantStorage.WRITE_ORDER_IN_FILE, mainMenu));
-		readAndWriteMenu.addMenuItem(new MenuItem(new WriteReplyInFileAction(), ConstantStorage.WRITE_REPLY_IN_FILE, mainMenu));
-		readAndWriteMenu.addMenuItem(new MenuItem(new ReadOrdersFromFileAction(), ConstantStorage.READ_ORDERS_FROM_FILE, mainMenu));
-		readAndWriteMenu.addMenuItem(new MenuItem(new ReadRepliesFromFileAction(), ConstantStorage.READ_REPLIES_FROM_FILE, mainMenu));
-		readAndWriteMenu.addMenuItem(new MenuItem(new ReadBooksFromFileAction(), ConstantStorage.READ_BOOKS_FROM_FILE, mainMenu));
+		readAndWriteMenu.addMenuItem(new MenuItem(new ReadBooksFromFileAction(), ConstantStorage.READ_BOOK_FROM_FILE, mainMenu));
+		readAndWriteMenu.addMenuItem(new MenuItem(new ReadOrdersFromFileAction(), ConstantStorage.READ_ORDER_FROM_FILE, mainMenu));
+		readAndWriteMenu.addMenuItem(new MenuItem(new ReadRepliesFromFileAction(), ConstantStorage.READ_REPLY_FROM_FILE, mainMenu));
 		readAndWriteMenu.addMenuItem(new MenuItem(new WriteOrdersInFileWithReflectionAction(), ConstantStorage.WRITE_ORDERS_IN_FILE_WITH_REFLECTION,mainMenu));
+		readAndWriteMenu.addMenuItem(new MenuItem(new WriteBooksInFileWithReflectionAction(), ConstantStorage.WRITE_BOOKS_IN_FILE_WITH_REFLECTION,mainMenu));
+		readAndWriteMenu.addMenuItem(new MenuItem(new WriteRepliesInFileWithReflectionAction(), ConstantStorage.WRITE_REPLIES_IN_FILE_WITH_REFLECTION,mainMenu));
 		readAndWriteMenu.addMenuItem(new MenuItem(null, ConstantStorage.EXIT_RW,null));
 
 		orderingSystemMenu.addMenuItem(new MenuItem(new AddOrderAction(), ConstantStorage.ADD_ORDER, orderingSystemMenu));

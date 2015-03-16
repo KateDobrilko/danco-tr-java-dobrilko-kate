@@ -2,7 +2,7 @@ package com.danco.training.dobrilko.action.order;
 
 import com.danco.training.dobrilko.action.IAction;
 import com.danco.training.dobrilko.controller.BookshopController;
-import com.danco.training.dobrilko.entitiy.Order;
+import com.danco.training.dobrilko.entity.Order;
 import com.danco.training.dobrilko.ioutil.IOUtil;
 import com.danco.training.dobrilko.ioutil.SpecificIOFeaturesUtil;
 

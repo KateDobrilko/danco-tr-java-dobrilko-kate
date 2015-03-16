@@ -2,14 +2,16 @@ package com.danco.training.dobrilko.database;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import com.danco.training.dobrilko.entitiy.Book;
+
+import com.danco.training.dobrilko.entity.Book;
 
 public class BookBase implements Serializable {
 
 	private static final long serialVersionUID = -350545889584292494L;
 	
 	private ArrayList<Book> books;
-
+	
+	
 	public BookBase() {
 		this.setBooks(new ArrayList<Book>());
 	}
@@ -32,7 +34,7 @@ public class BookBase implements Serializable {
 		for (Book b : this.books) {
 			if (b.getId() == book.getId()) {
 				idUnique = false;
-				update(b.getId(), book);
+				b.setNumberOfExemplars(b.getNumberOfExemplars()+1);;
 				break;
 			}
 		}
@@ -55,8 +57,9 @@ public class BookBase implements Serializable {
 		}
 		if (idUnique) {
 			Book book = getById(id);
-			if (!book.isOrdered()) {
-				books.remove(book);
+			if ((!book.isOrdered())&&(book.getNumberOfExemplars()!=0)) {
+				book.setNumberOfExemplars(book.getNumberOfExemplars()-1);
+				book.setDateOfAddition(null);
 				successfullyDeleted = true;
 			}
 
@@ -89,4 +92,9 @@ public class BookBase implements Serializable {
 		return book;
 	}
 
+	public Book[] getBooksArray() {
+		Book [] booksArray = new Book[books.size()];
+		booksArray = books.toArray(booksArray);
+		return booksArray;
+	}
 }

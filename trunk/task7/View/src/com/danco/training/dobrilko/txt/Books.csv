@@ -1,4 +1,4 @@
-105647;Harry Potter and the Philosopher’s Stone;J. K. Rowling;not ordered;15.25;30;6;1997;10;3;2015;
-123546;American Psycho;B.E.Ellis;not ordered;2.5;14;8;1991;12;7;2012;
-178654;Animal Farm;George Orwell;not ordered;7.8;5;6;1945;13;5;2013;
-164758;The Federal Mafia;Irwin Schiff;not ordered;8.9;12;8;1992;8;3;2015;
+105647;Harry Potter and the Philosopher’s Stone;J. K. Rowling;15.25;false;false;7;30;6;1997;10;3;2015;
+123546;American Psycho;B.E.Ellis;2.5;false;false;4;14;8;1991;12;7;2012;
+178654;Animal Farm;George Orwell;7.8;false;false;3;5;6;1945;
+164758;The Federal Mafia;Irwin Schiff;8.9;false;false;0;12;8;1992;8;3;2015;

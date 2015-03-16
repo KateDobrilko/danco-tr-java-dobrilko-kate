@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.InputMismatchException;
 
 import com.danco.training.dobrilko.controller.BookshopController;
-import com.danco.training.dobrilko.entitiy.Book;
-import com.danco.training.dobrilko.entitiy.Order;
-import com.danco.training.dobrilko.entitiy.Reply;
+import com.danco.training.dobrilko.entity.Book;
+import com.danco.training.dobrilko.entity.Order;
+import com.danco.training.dobrilko.entity.Reply;
 
 public class SpecificIOFeaturesUtil {
 	@SuppressWarnings("deprecation")
@@ -132,9 +132,9 @@ public class SpecificIOFeaturesUtil {
 			Date doe = order.getDateOfExecution();
 			IOUtil.print(Integer.toString(doe.getDate()));
 			IOUtil.print(";");
-			IOUtil.print(Integer.toString(doe.getMonth() + 1));
+			IOUtil.print(Integer.toString(doe.getMonth()));
 			IOUtil.print(";");
-			IOUtil.print(Integer.toString(doe.getYear() + 1900));
+			IOUtil.print(Integer.toString(doe.getYear()));
 		}
 		IOUtil.println();
 		for (Book book : order.getBooks()) {
