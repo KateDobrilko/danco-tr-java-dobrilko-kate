@@ -1,4 +1,4 @@
-package com.danco.training.dobrilko.entitiy;
+package com.danco.training.dobrilko.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,20 +7,22 @@ import java.util.Date;
 import com.danco.training.dobrilko.annotation.CSVCompositeList;
 import com.danco.training.dobrilko.annotation.CSVEntity;
 import com.danco.training.dobrilko.annotation.CSVPrimitiveProperty;
+import com.danco.training.dobrilko.bookshop.Bookshop;
 import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
 import com.danco.training.dobrilko.interfaceholder.HasId;
-@CSVEntity(csvPath = CSVFileReflectionPath.OrderReflectionPath)
+
+@CSVEntity(csvPath = CSVFileReflectionPath.ORDER_REFLECTION_PATH)
 public class Order implements Serializable, Cloneable, HasId {
 	private static final long serialVersionUID = 8844590591157079914L;
-	@CSVPrimitiveProperty
+	@CSVPrimitiveProperty(positionInString = 0)
 	private int id;
-	@CSVCompositeList
+	@CSVCompositeList(clazzOfMembers = Book.class)
 	private ArrayList<Book> books = new ArrayList<Book>();
-	@CSVPrimitiveProperty
-    private int numberOfBooks;
-	@CSVPrimitiveProperty
+	@CSVPrimitiveProperty(positionInString = 1)
+	private int numberOfBooks;
+	@CSVPrimitiveProperty(positionInString = 2)
 	private Date dateOfExecution;
-	
+
 	private boolean status; // true - in progress, false - executed
 
 	public Order() {
@@ -37,6 +39,19 @@ public class Order implements Serializable, Cloneable, HasId {
 
 	}
 
+	public Order(ArrayList<Integer> bookIds, int id, boolean status,
+			Date dateOfExecution) {
+		this.setId(id);
+		this.setDateOfExecution(dateOfExecution);
+		this.setStatus(true);
+		for (Integer bookId : bookIds) {
+			this.books.add(Bookshop.getInstance().getBookBase()
+					.getById((int) bookId));
+		}
+		this.setNumberOfBooks(bookIds.size());
+
+	}
+
 	public double getSum() {
 		double sum = 0;
 		for (Book book : books) {
@@ -46,9 +61,9 @@ public class Order implements Serializable, Cloneable, HasId {
 	}
 
 	public ArrayList<Book> getBooks() {
-		
+
 		return books;
-		
+
 	}
 
 	public void setBooks(ArrayList<Book> books) {
@@ -81,19 +96,8 @@ public class Order implements Serializable, Cloneable, HasId {
 	}
 
 	public Order clone() throws CloneNotSupportedException {
-		Order order = new Order();
-		ArrayList<Book> books = new ArrayList<Book>();
-		for (Book book : this.getBooks()) {
-			books.add(book.clone());
-		}
-		order.setBooks(books);
-		if (this.getDateOfExecution() != null) {
-			order.setDateOfExecution((Date) this.getDateOfExecution().clone());
-		} else {
-			order.setDateOfExecution(null);
-		}
-		order.setId(this.getId());
-		order.setStatus(this.getStatus());
+		Order order = (Order) super.clone();
+		order.setBooks(new ArrayList<Book>());		
 		return order;
 
 	}
