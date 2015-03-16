@@ -1,40 +1,43 @@
-package com.danco.training.dobrilko.entitiy;
+package com.danco.training.dobrilko.entity;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import com.danco.training.dobrilko.annotation.CSVEntity;
 import com.danco.training.dobrilko.annotation.CSVPrimitiveProperty;
+import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
 import com.danco.training.dobrilko.interfaceholder.HasId;
-
+@CSVEntity(csvPath = CSVFileReflectionPath.BOOK_REFLECTION_PATH)
 public class Book implements Serializable, Cloneable, HasId {
 	private static final long serialVersionUID = 731457861374086264L;
-	@CSVPrimitiveProperty
-	private String name;
-	@CSVPrimitiveProperty
-	private String author;
-	@CSVPrimitiveProperty
-	private double price;
-	@CSVPrimitiveProperty
+	@CSVPrimitiveProperty(positionInString = 0)
 	private int id;
-	@CSVPrimitiveProperty
-	private Date dateOfAddition;
-	@CSVPrimitiveProperty
-	private Date dateOfPublication;
-	@CSVPrimitiveProperty
+	@CSVPrimitiveProperty(positionInString = 1)
+	private String name;
+	@CSVPrimitiveProperty(positionInString = 2)
+	private String author;
+	@CSVPrimitiveProperty(positionInString = 4)
 	private boolean unclaimed;
-	@CSVPrimitiveProperty
+	@CSVPrimitiveProperty(positionInString = 5)
 	private boolean ordered;
-
+	@CSVPrimitiveProperty(positionInString = 6)
+	private int numberOfExemplars;
+	@CSVPrimitiveProperty(positionInString = 7)
+	private Date dateOfPublication;
+	@CSVPrimitiveProperty(positionInString = 10)
+	private Date dateOfAddition;
+	@CSVPrimitiveProperty(positionInString = 3)
+	private double price;
 	public Book() {
 
 	}
 
 	public Book(String name, String author, double price, int id,
-			Date dateOfAddition, Date dateOfPublication, boolean ordered) {
+			Date dateOfAddition, Date dateOfPublication, boolean ordered, int numberOfExemplars) {
 		this.name = name;
 		this.ordered = ordered;
 		this.author = author;
-
+        this.numberOfExemplars = numberOfExemplars;
 		this.dateOfAddition = dateOfAddition;
 		this.dateOfPublication = dateOfPublication;
 		this.id = id;
@@ -51,6 +54,7 @@ public class Book implements Serializable, Cloneable, HasId {
 		this.dateOfPublication = dateOfPublication;
 		this.id = id;
 		this.price = price;
+		this.numberOfExemplars = 0;
 	}
 
 	public String getName() {
@@ -79,6 +83,14 @@ public class Book implements Serializable, Cloneable, HasId {
 
 	public int getId() {
 		return id;
+	}
+
+	public void setNumberOfExemplars(int num) {
+		this.numberOfExemplars = num;
+	}
+	
+	public int getNumberOfExemplars() {
+		return this.numberOfExemplars;
 	}
 
 	public void setId(int id) {
