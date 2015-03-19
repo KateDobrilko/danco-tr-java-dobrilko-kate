@@ -1,16 +1,16 @@
 package com.danco.training.dobrilko.action.book;
 
 import com.danco.training.dobrilko.action.IAction;
-import com.danco.training.dobrilko.controller.BookshopController;
-import com.danco.training.dobrilko.entity.Book;
 import com.danco.training.dobrilko.ioutil.IOUtil;
-import com.danco.training.dobrilko.ioutil.SpecificIOFeaturesUtil;
+import com.danco.training.dobrilko.ui.icontrollerinstance.ControllerHolder;
 
 public class ShowAllBooksAction implements IAction {
+	
+
 	public void execute() {
-		for (Book book : BookshopController.getBooks()) {
-			SpecificIOFeaturesUtil.printBook(book);
-			IOUtil.println();
-		}
+
+		IOUtil.print(ControllerHolder.getInstance().getController().getBooks());
+		IOUtil.println();
+
 	}
 }

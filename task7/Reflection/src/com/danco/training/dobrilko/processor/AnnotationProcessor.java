@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -20,7 +21,6 @@ import com.danco.training.dobrilko.annotation.CSVEntity;
 import com.danco.training.dobrilko.annotation.CSVPrimitiveProperty;
 import com.danco.training.dobrilko.comparator.CSVPrimitivePropertyPositionComparator;
 import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
-import com.danco.training.dobrilko.interfaceholder.HasId;
 import com.danco.training.dobrilko.reflectionproperty.PropertyStorage;
 
 public class AnnotationProcessor {
@@ -157,12 +157,23 @@ public class AnnotationProcessor {
 						value = (ArrayList<Object>) newField.get(object);
 
 						for (Object obj : value) {
-							if (obj instanceof HasId) {
+							
 								sb.append(System.lineSeparator());
-								sb.append(((HasId) obj).getId());
+								try {
+									Method m  = (obj.getClass().getMethod(field.getAnnotation(CSVCompositeList.class).getIdFunction(), (Class<?>[])null));
+									try {
+										sb.append(m.invoke(obj, (Object[])null));
+									} catch (InvocationTargetException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									};
+								} catch (NoSuchMethodException e) {
+									Logger logger = Logger.getLogger(AnnotationProcessor.class);
+									logger.error("No such method!", e);
+								}
 								sb.append(csvEntity.valuesSeparator());
 
-							}
+							
 						}
 					}
 
@@ -178,10 +189,22 @@ public class AnnotationProcessor {
 					newField.setAccessible(true);
 					value = newField.get(object);
 
-					if (value instanceof HasId) {
-						sb.append(((HasId) value).getId());
+					
+						try {
+							Method m  = (value.getClass().getMethod(field.getAnnotation(CSVCompositeProperty.class).getIdFunction(), (Class<?>[])null));
+							try {
+								sb.append(m.invoke(value, (Object[])null));
+							} catch (InvocationTargetException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} catch (NoSuchMethodException e) {
+							Logger logger = Logger.getLogger(AnnotationProcessor.class);
+							logger.error("No such method!", e);
+							
+						}
 						sb.append(csvEntity.valuesSeparator());
-					}
+					
 				}
 			}
 			sb.append(System.lineSeparator());

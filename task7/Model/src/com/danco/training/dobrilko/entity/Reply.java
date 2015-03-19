@@ -18,7 +18,7 @@ public class Reply implements Serializable {
 	private int numberOfRequests;
 	@CSVPrimitiveProperty(positionInString = 2)
 	private boolean executed = false;
-	@CSVCompositeProperty
+	@CSVCompositeProperty(getIdFunction = "getId")
 	private Book book;
 
 	public Reply() {

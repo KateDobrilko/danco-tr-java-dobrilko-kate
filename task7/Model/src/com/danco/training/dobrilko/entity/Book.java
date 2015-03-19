@@ -6,9 +6,8 @@ import java.util.Date;
 import com.danco.training.dobrilko.annotation.CSVEntity;
 import com.danco.training.dobrilko.annotation.CSVPrimitiveProperty;
 import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
-import com.danco.training.dobrilko.interfaceholder.HasId;
 @CSVEntity(csvPath = CSVFileReflectionPath.BOOK_REFLECTION_PATH)
-public class Book implements Serializable, Cloneable, HasId {
+public class Book implements Serializable, Cloneable {
 	private static final long serialVersionUID = 731457861374086264L;
 	@CSVPrimitiveProperty(positionInString = 0)
 	private int id;

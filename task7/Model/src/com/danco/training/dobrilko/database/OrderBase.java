@@ -58,17 +58,18 @@ public class OrderBase implements Serializable {
 	}
 
 	public boolean delete(int id) {
-		boolean idUnique = true;
+		boolean idUnique = false;
 		for (Order o : this.orders) {
 			if (o.getId() == id) {
-				idUnique = false;
+				this.orders.removeIf((Order order) -> order.getId() == id);
+				ordersArray = new Order[orders.size()];
+				ordersArray = orders.toArray(ordersArray);
+				idUnique = true;
 				break;
 			}
 		}
 		if (idUnique) {
-			this.orders.removeIf((Order order) -> order.getId() == id);
-			ordersArray = new Order[orders.size()];
-			ordersArray = orders.toArray(ordersArray);
+			
 
 		}
 

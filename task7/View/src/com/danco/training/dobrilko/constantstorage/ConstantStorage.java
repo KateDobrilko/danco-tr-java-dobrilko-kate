@@ -11,9 +11,9 @@ public class ConstantStorage {
 
 	public final static String WRITE_TO_FILE = "Press 0 - Write to file";
 	public final static String READ_FROM_FILE = "Press 1 - Read from file";
-	public final static String READ_BOOK_FROM_FILE = "Press 2 - Read book in file";
-	public final static String READ_ORDER_FROM_FILE = "Press 3 - Read order in file";
-	public final static String READ_REPLY_FROM_FILE = "Press 4 - Read reply in file";
+	public final static String READ_BOOK_FROM_FILE = "Press 2 - Read books from file";
+	public final static String READ_ORDER_FROM_FILE = "Press 3 - Read orders from file";
+	public final static String READ_REPLY_FROM_FILE = "Press 4 - Read replies from file";
 	public final static String WRITE_ORDERS_IN_FILE_WITH_REFLECTION = "Press 5 - Write orders in file with reflection";
 	public final static String WRITE_BOOKS_IN_FILE_WITH_REFLECTION = "Press 6 - Write books in file with reflection";
 	public final static String WRITE_REPLIES_IN_FILE_WITH_REFLECTION = "Type 7 - Write replies in file with reflection";
