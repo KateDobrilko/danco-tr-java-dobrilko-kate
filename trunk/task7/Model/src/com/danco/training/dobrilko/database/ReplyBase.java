@@ -33,6 +33,7 @@ public class ReplyBase implements Serializable {
 		boolean idUnique = true;
 		for (Reply r : this.replies) {
 			if (r.getId() == reply.getId()) {
+				r.setNumberOfRequests(r.getNumberOfRequests() + 1);
 				idUnique = false;
 				break;
 			}
@@ -44,6 +45,7 @@ public class ReplyBase implements Serializable {
 						&& (b.getDateOfAddition() == null)) {
 					reply.setBook(b);
 					boolean flag = false;
+					
 					for (Reply r : this.replies) {
 						if (r.getBook().getId() == reply.getBook().getId()) {
 							r.setNumberOfRequests(r.getNumberOfRequests() + 1);

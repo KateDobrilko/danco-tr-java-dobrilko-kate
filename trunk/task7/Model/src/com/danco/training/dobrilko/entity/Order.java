@@ -9,14 +9,13 @@ import com.danco.training.dobrilko.annotation.CSVEntity;
 import com.danco.training.dobrilko.annotation.CSVPrimitiveProperty;
 import com.danco.training.dobrilko.bookshop.Bookshop;
 import com.danco.training.dobrilko.enumeration.CSVFileReflectionPath;
-import com.danco.training.dobrilko.interfaceholder.HasId;
 
 @CSVEntity(csvPath = CSVFileReflectionPath.ORDER_REFLECTION_PATH)
-public class Order implements Serializable, Cloneable, HasId {
+public class Order implements Serializable, Cloneable {
 	private static final long serialVersionUID = 8844590591157079914L;
 	@CSVPrimitiveProperty(positionInString = 0)
 	private int id;
-	@CSVCompositeList(clazzOfMembers = Book.class)
+	@CSVCompositeList(clazzOfMembers = Book.class, getIdFunction = "getId")
 	private ArrayList<Book> books = new ArrayList<Book>();
 	@CSVPrimitiveProperty(positionInString = 1)
 	private int numberOfBooks;
@@ -34,7 +33,11 @@ public class Order implements Serializable, Cloneable, HasId {
 		this.setId(id);
 		this.setBooks(books);
 		this.setDateOfExecution(dateOfExecution);
-		this.setStatus(true);
+		if(dateOfExecution==null)
+		{this.setStatus(true);}
+		else{
+			this.setStatus(false);
+		}
 		this.setNumberOfBooks(books.size());
 
 	}
@@ -43,7 +46,11 @@ public class Order implements Serializable, Cloneable, HasId {
 			Date dateOfExecution) {
 		this.setId(id);
 		this.setDateOfExecution(dateOfExecution);
-		this.setStatus(true);
+		if(dateOfExecution==null)
+		{this.setStatus(true);}
+		else{
+			this.setStatus(false);
+		}
 		for (Integer bookId : bookIds) {
 			this.books.add(Bookshop.getInstance().getBookBase()
 					.getById((int) bookId));

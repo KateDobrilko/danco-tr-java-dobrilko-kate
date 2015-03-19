@@ -1,12 +1,15 @@
 package com.danco.training.dobrilko.action.readwrite;
 
 import com.danco.training.dobrilko.action.IAction;
-import com.danco.training.dobrilko.controller.BookshopController;
 import com.danco.training.dobrilko.property.PropertyStorage;
+import com.danco.training.dobrilko.ui.icontrollerinstance.ControllerHolder;
 
 public class ReadFromFileAction implements IAction {
+	
+
 	public void execute() {
-		
-		BookshopController.readFromFile(PropertyStorage.getInstance().getSerializationStoragePath());
+
+		ControllerHolder.getInstance().getController().readFromFile(PropertyStorage.getInstance()
+				.getSerializationStoragePath());
 	}
 }

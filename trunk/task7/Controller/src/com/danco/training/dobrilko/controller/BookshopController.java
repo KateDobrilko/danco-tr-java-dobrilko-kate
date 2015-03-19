@@ -19,17 +19,22 @@ import com.danco.training.dobrilko.comparator.OrderExecutedComparator;
 import com.danco.training.dobrilko.comparator.OrderPriceComparator;
 import com.danco.training.dobrilko.comparator.ReplyAlphabetComparator;
 import com.danco.training.dobrilko.comparator.ReplyNumberComparator;
+import com.danco.training.dobrilko.controller.api.IController;
+import com.danco.training.dobrilko.controller.property.PropertyStorage;
 import com.danco.training.dobrilko.database.OrderBase;
 import com.danco.training.dobrilko.entity.Book;
 import com.danco.training.dobrilko.entity.Order;
 import com.danco.training.dobrilko.entity.Reply;
+import static  com.danco.training.dobrilko.other.ParseUtil.*;
 import com.danco.training.dobrilko.other.SerializerUtil;
 import com.danco.training.dobrilko.processor.AnnotationProcessor;
-import com.danco.training.dobrilko.property.PropertyStorage;
 
-public class BookshopController {
+public class BookshopController implements IController {
 
-	public static void readOrdersFromFile() throws IllegalArgumentException {
+	public BookshopController() {
+	}
+
+	public void readOrdersFromFile() throws IllegalArgumentException {
 		try {
 			Object[] orders = AnnotationProcessor.getInstance().readFromFile(
 					Order.class);
@@ -47,7 +52,7 @@ public class BookshopController {
 
 	}
 
-	public static void readBooksFromFile() throws IllegalArgumentException {
+	public void readBooksFromFile() throws IllegalArgumentException {
 		try {
 			Object[] books = AnnotationProcessor.getInstance().readFromFile(
 					Book.class);
@@ -65,7 +70,7 @@ public class BookshopController {
 		}
 	}
 
-	public static void readRepliesFromFile() throws IllegalArgumentException {
+	public void readRepliesFromFile() throws IllegalArgumentException {
 		try {
 			Object[] replies = AnnotationProcessor.getInstance().readFromFile(
 					Reply.class);
@@ -83,7 +88,7 @@ public class BookshopController {
 		}
 	}
 
-	public static void writeOrdersWithReflection() {
+	public void writeOrdersWithReflection() {
 
 		try {
 
@@ -102,7 +107,7 @@ public class BookshopController {
 		}
 	}
 
-	public static void writeRepliesWithReflection() {
+	public void writeRepliesWithReflection() {
 
 		try {
 
@@ -121,7 +126,7 @@ public class BookshopController {
 		}
 	}
 
-	public static void writeBooksWithReflection() {
+	public void writeBooksWithReflection() {
 
 		try {
 
@@ -140,30 +145,34 @@ public class BookshopController {
 		}
 	}
 
-	public static void readFromFile(String path) {
+	public void readFromFile(String path) {
 		SerializerUtil.ReadFromFile(path);
 	}
 
-	public static void writeInFile(String path) {
+	public void writeInFile(String path) {
 		SerializerUtil.WriteInFile(path);
 	}
 
-	public static Order cloneOrder(int id) {
+	public void cloneOrder(int id) {
 		try {
-			return Bookshop.getInstance().getOrderBase().getById(id).clone();
+			Bookshop.getInstance()
+					.getOrderBase()
+					.add(Bookshop.getInstance().getOrderBase().getById(id)
+							.clone());
 		} catch (CloneNotSupportedException e) {
 			Logger logger = Logger.getLogger(BookshopController.class);
 			logger.error("Cannot clone order with id " + id);
-			return null;
+
 		}
 	}
 
-	public static void addOrder(Order order) {
+	public void addOrder(String orderString) {
 
-		Bookshop.getInstance().getOrderBase().add(order);
+		Bookshop.getInstance().getOrderBase()
+				.add(parseOrderString(orderString));
 	}
 
-	public static void cancelOrder(int id) {
+	public void cancelOrder(int id) {
 
 		Order order = getOrderById(id);
 		if (order.getStatus()) {
@@ -181,7 +190,7 @@ public class BookshopController {
 
 	}
 
-	public static void executeOrder(int id) {
+	public void executeOrder(int id) {
 
 		int count = 0;
 
@@ -243,11 +252,17 @@ public class BookshopController {
 
 	}
 
-	public static ArrayList<Order> getOrders() {
-		return Bookshop.getInstance().getOrderBase().getOrders();
+	public String getOrdersString() {
+		StringBuilder sb = new StringBuilder();
+
+		for (Order order : Bookshop.getInstance().getOrderBase().getOrders()) {
+			sb.append(orderToString(order));
+			sb.append(System.lineSeparator());
+		}
+		return sb.toString();
 	}
 
-	public static double getSumOfExecutedOrders(Date startDate, Date endDate) {
+	public double getSumOfExecutedOrders(Date startDate, Date endDate) {
 		double sum = 0;
 
 		for (Order order : getExecutedOrders(startDate, endDate)) {
@@ -257,18 +272,17 @@ public class BookshopController {
 		return sum;
 	}
 
-	public static ArrayList<Order> getExecutedOrders() {
+	private ArrayList<Order> getExecutedOrders() {
 		ArrayList<Order> executed = new ArrayList<Order>();
 		for (Order order : Bookshop.getInstance().getOrderBase().getOrders()) {
-			if (!order.getStatus()) {
+			if (order.getStatus()) {
 				executed.add(order);
 			}
 		}
 		return executed;
 	}
 
-	public static ArrayList<Order> getExecutedOrders(Date startDate,
-			Date endDate) {
+	private ArrayList<Order> getExecutedOrders(Date startDate, Date endDate) {
 		ArrayList<Order> executed = new ArrayList<Order>();
 		for (Order order : getExecutedOrders()) {
 			boolean condition1 = order.getDateOfExecution().after(startDate);
@@ -281,66 +295,87 @@ public class BookshopController {
 		return executed;
 	}
 
-	public static int getNumberOfExecutedOrders(Date startDate, Date endDate) {
+	public String getExecutedOrdersString(Date startDate, Date endDate) {
+		StringBuilder sb = new StringBuilder();
+		for (Order order : getExecutedOrders()) {
+			boolean condition1 = order.getDateOfExecution().after(startDate);
+			boolean condition2 = order.getDateOfExecution().before(endDate);
+			if ((condition1 == true) && (condition2 == true)) {
+				sb.append(orderToString(order));
+				sb.append(System.lineSeparator());
+			}
+			;
+		}
+		return sb.toString();
+	}
+
+	public int getNumberOfExecutedOrders(Date startDate, Date endDate) {
 		return getExecutedOrders(startDate, endDate).size();
 	}
 
-	public static void sortOrdersByDate() {
+	public void sortOrdersByDate() {
 		Bookshop.getInstance().getOrderBase().getOrders()
 				.sort(new OrderDateComparator());
 
 	}
 
-	public static void sortOrdersByExecution() {
+	public void sortOrdersByExecution() {
 		Bookshop.getInstance().getOrderBase().getOrders()
 				.sort(new OrderExecutedComparator());
 
 	}
 
 	@SuppressWarnings("deprecation")
-	public static void markUnclaimedBooks() {
+	public void markUnclaimedBooks() {
 
 		for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
-			Date date = new Date();
+			if (book.getDateOfAddition() != null) {
+				Date date = new Date();
 
-			LocalDate ldcurr = LocalDate.of(date.getYear() + 1900,
-					date.getMonth() + 1, date.getDate());
-			LocalDate ld = LocalDate.of(book.getDateOfAddition().getYear(),
-					book.getDateOfAddition().getMonth(), book
-							.getDateOfAddition().getDate());
-			Period period = Period.between(ld, ldcurr);
+				LocalDate ldcurr = LocalDate.of(date.getYear() + 1900,
+						date.getMonth() + 1, date.getDate());
+				LocalDate ld = LocalDate.of(book.getDateOfAddition().getYear(),
+						book.getDateOfAddition().getMonth(), book
+								.getDateOfAddition().getDate());
+				Period period = Period.between(ld, ldcurr);
 
-			if (period.getMonths() >= PropertyStorage.getInstance()
-					.getMonthsToMarkUnclaimed()) {
-				book.setUnclaimed(true);
+				if (period.getMonths() >= PropertyStorage.getInstance().getMonthsToMarkUnclaimed()) {
+					book.setUnclaimed(true);
+				}
 			}
 		}
 	}
 
-	public static void sortOrdersByPrice() {
+	public void sortOrdersByPrice() {
 		Bookshop.getInstance().getOrderBase().getOrders()
 				.sort(new OrderPriceComparator());
 
 	}
 
-	public static Order getOrderById(int id) {
+	public String getOrderStringById(int id) {
+		return orderToString(Bookshop.getInstance().getOrderBase().getById(id));
+	}
+
+	private Order getOrderById(int id) {
 		return Bookshop.getInstance().getOrderBase().getById(id);
 	}
 
-	public static void addBook(Book book) {
+	public void addBook(String bookString) {
 
 		if (PropertyStorage.getInstance().getMarkRepliesAsExecuted()) {
-			Bookshop.getInstance().getBookBase().add(book);
+			Bookshop.getInstance().getBookBase()
+					.add(parseBookString(bookString));
 			markRepliesAsExecuted();
 		}
 
 		else {
-			Bookshop.getInstance().getBookBase().add(book);
+			Bookshop.getInstance().getBookBase()
+					.add(parseBookString(bookString));
 		}
 
 	}
 
-	public static void deleteBook(int id) {
+	public void deleteBook(int id) {
 
 		boolean result = Bookshop.getInstance().getBookBase().delete(id);
 		if (!result) {
@@ -352,60 +387,74 @@ public class BookshopController {
 		}
 	}
 
-	public static ArrayList<Book> getBooks() {
-		return Bookshop.getInstance().getBookBase().getBooks();
+	public String getBooks() {
+		StringBuilder sb = new StringBuilder();
+		for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
+			sb.append(bookToString(book));
+			sb.append(System.lineSeparator());
+		}
+		return sb.toString();
 	}
 
-	public static ArrayList<Book> getUnclaimedBooks() {
+	public String getUnclaimedBooks() {
+		StringBuilder sb = new StringBuilder();
 		markUnclaimedBooks();
-		ArrayList<Book> unclaimedBooks = new ArrayList<Book>();
 		for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
 			if (book.isUnclaimed()) {
-				unclaimedBooks.add(book);
+				sb.append(bookToString(book));
+				sb.append(System.lineSeparator());
+
 			}
 		}
-		return unclaimedBooks;
+
+		return sb.toString();
 	}
 
-	public static void sortBookByPublicationDate() {
+	public void sortBookByPublicationDate() {
 		Collections.sort(Bookshop.getInstance().getBookBase().getBooks(),
 				new BookPublicationDateComparator());
 	}
 
-	public static void sortBookByName() {
+	public void sortBookByName() {
 		Collections.sort(Bookshop.getInstance().getBookBase().getBooks(),
 				new BookNameComparator());
 	}
 
-	public static void sortBookByPrice() {
+	public void sortBookByPrice() {
 		Collections.sort(Bookshop.getInstance().getBookBase().getBooks(),
 				new BookPriceComparator());
 	}
 
-	public static Book getBookById(int id) {
-		return Bookshop.getInstance().getBookBase().getById(id);
+	public String getBookById(int id) {
+		return bookToString(Bookshop.getInstance().getBookBase().getById(id));
 	}
 
-	public static ArrayList<Reply> getReplies() {
-		return Bookshop.getInstance().getReplyBase().getReplies();
+	public String getReplies() {
+		StringBuilder sb = new StringBuilder();
+		for (Reply reply : Bookshop.getInstance().getReplyBase().getReplies()) {
+			sb.append(replyToString(reply));
+			sb.append(System.lineSeparator());
+		}
+		return sb.toString();
 	}
 
-	public static void sortRepliesByAlphabet() {
+	public void sortRepliesByAlphabet() {
 		Collections.sort(Bookshop.getInstance().getReplyBase().getReplies(),
 				new ReplyAlphabetComparator());
 	}
 
-	public static void sortRepliesByNumber() {
+	public void sortRepliesByNumber() {
 		Collections.sort(Bookshop.getInstance().getReplyBase().getReplies(),
 				new ReplyNumberComparator());
 	}
 
-	public static void addReply(Reply reply) {
-		Bookshop.getInstance().getReplyBase().add(reply);
+	public void addReply(String replyString) {
+		Bookshop.getInstance().getReplyBase()
+				.add(parseReplyString(replyString));
 
 	}
 
-	public static void markRepliesAsExecuted() {
+	public void markRepliesAsExecuted() {
 
 		for (Reply reply : Bookshop.getInstance().getReplyBase().getReplies()) {
 			for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
@@ -427,7 +476,9 @@ public class BookshopController {
 
 	}
 
-	public static Reply getReplyById(int id) {
-		return Bookshop.getInstance().getReplyBase().getById(id);
+	public String getReplyById(int id) {
+		return replyToString(Bookshop.getInstance().getReplyBase().getById(id));
 	}
+
+	
 }
