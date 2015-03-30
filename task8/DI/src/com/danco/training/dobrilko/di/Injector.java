@@ -11,7 +11,9 @@ import com.danco.training.dobrilko.di.enumeration.ControllerClass;
 import com.danco.training.dobrilko.di.property.PropertyStorage;
 
 public class Injector {
-	public static <T> void inject(T object)  {
+	private static Logger logger = Logger.getLogger(Injector.class);
+
+	public static <T> void inject(T object) {
 		final Field[] declaredFields = object.getClass().getDeclaredFields();
 		ArrayList<Field> fieldsToInject = new ArrayList<Field>();
 		for (Field field : declaredFields) {
@@ -33,12 +35,12 @@ public class Injector {
 				if (field.getType().isAssignableFrom(
 						Class.forName(injectionClassName))) {
 					try {
-						IBookshopController ic = (IBookshopController) Class.forName(injectionClassName).newInstance();
-						field.set(object,
-								ic);
+						IBookshopController ic = (IBookshopController) Class
+								.forName(injectionClassName).newInstance();
+						field.set(object, ic);
 					} catch (IllegalArgumentException | IllegalAccessException
 							| InstantiationException | ClassNotFoundException e) {
-						Logger logger = Logger.getLogger(Injector.class);
+
 						logger.error("Error during injection!", e);
 					}
 				}

@@ -18,7 +18,8 @@ public class MenuController {
 
 	public void run(ObjectOutputStream out, ObjectInputStream in) {
 
-		navigator.print();
+		if(navigator.getCurrentMenu()!=null)
+		{navigator.print();}
 		this.exitFlag = !navigator.navigate(IOUtil.readInt(), in, out);
 
 	}

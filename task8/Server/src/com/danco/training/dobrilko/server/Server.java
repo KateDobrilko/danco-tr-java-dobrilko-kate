@@ -14,7 +14,7 @@ public class Server {
 	private int port;
 	@Inject(controllerClass = ControllerClass.BOOKSHOP_CONTROLLER)
 	private IBookshopController bsController;
-
+	private Logger logger = Logger.getLogger(Server.class);
 	public Server(int port) {
 		this.port = port;
 
@@ -40,7 +40,7 @@ public class Server {
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
-				Logger logger = Logger.getLogger(Server.class);
+				
 				logger.error("IOException has been caught!", e);
 			}
 		}
