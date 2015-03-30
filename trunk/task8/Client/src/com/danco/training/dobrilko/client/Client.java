@@ -14,6 +14,7 @@ public class Client {
 	private String serverIP;
 	private int serverPort;
 	private MenuController menuController;
+	private Logger logger = Logger.getLogger(Client.class);
 
 	public Client(String serverIP, int serverPort) {
 		this.serverIP = serverIP;
@@ -34,11 +35,11 @@ public class Client {
 
 			while (menuController.getExitFlag() != true) {
 				menuController.run(out, in);
-
 			}
+			
 
 		} catch (IOException e) {
-			Logger logger = Logger.getLogger(Client.class);
+			
 			logger.error("IOException has been caught!", e);
 		}
 	}

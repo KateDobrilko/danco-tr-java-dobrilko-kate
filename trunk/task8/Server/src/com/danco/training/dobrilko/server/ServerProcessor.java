@@ -9,7 +9,7 @@ import com.danco.training.dobrilko.command.Command;
 import com.danco.training.dobrilko.controller.api.IBookshopController;
 
 public class ServerProcessor {
-
+	Logger logger = Logger.getLogger(ServerProcessor.class);
 	private IBookshopController bsController;
 
 	public ServerProcessor(IBookshopController bsController) {
@@ -17,7 +17,7 @@ public class ServerProcessor {
 	}
 
 	public Object executeCommand(Object command) {
-		Object answer = null;
+		Object answer = "EMPTY";
 
 		Class<?> bsClass = bsController.getClass();
 		for (Method method : bsClass.getMethods()) {
@@ -42,11 +42,11 @@ public class ServerProcessor {
 								}
 							}
 						} else {
-
+							answer = "Exit";
 						}
 					} catch (IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException e) {
-						Logger logger = Logger.getLogger(ServerProcessor.class);
+
 						logger.error(
 								"IllegalAccessException | IllegalArgumentException| InvocationTargetException has been caught!",
 								e);

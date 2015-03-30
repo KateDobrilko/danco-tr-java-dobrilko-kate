@@ -33,6 +33,8 @@ import com.danco.training.dobrilko.processor.AnnotationProcessor;
 
 public class BookshopController implements IBookshopController {
 
+	private Logger logger = Logger.getLogger(BookshopController.class);
+
 	public BookshopController() {
 	}
 
@@ -49,7 +51,7 @@ public class BookshopController implements IBookshopController {
 				| SecurityException | NoSuchMethodException
 				| InstantiationException | InvocationTargetException
 				| IOException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("Error during reading orders from file!");
 		}
 
@@ -69,7 +71,7 @@ public class BookshopController implements IBookshopController {
 				| SecurityException | NoSuchMethodException
 				| InstantiationException | InvocationTargetException
 				| IOException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("Error during reading books from file!");
 		}
 	}
@@ -88,7 +90,7 @@ public class BookshopController implements IBookshopController {
 				| SecurityException | NoSuchMethodException
 				| InstantiationException | InvocationTargetException
 				| IOException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("Error during reading replies from file!", e);
 		}
 	}
@@ -101,13 +103,13 @@ public class BookshopController implements IBookshopController {
 					Bookshop.getInstance().getOrderBase().getOrdersArray());
 		} catch (IllegalArgumentException | IllegalAccessException
 				| IOException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("IO error detected!", e);
 		} catch (NoSuchFieldException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("NoSuchField error detected!", e);
 		} catch (SecurityException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("Security error detected!", e);
 		}
 	}
@@ -120,13 +122,13 @@ public class BookshopController implements IBookshopController {
 					Bookshop.getInstance().getReplyBase().getRepliesArray());
 		} catch (IllegalArgumentException | IllegalAccessException
 				| IOException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("IO error detected!", e);
 		} catch (NoSuchFieldException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("NoSuchField error detected!", e);
 		} catch (SecurityException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("Security error detected!", e);
 		}
 	}
@@ -139,13 +141,13 @@ public class BookshopController implements IBookshopController {
 					Bookshop.getInstance().getBookBase().getBooksArray());
 		} catch (IllegalArgumentException | IllegalAccessException
 				| IOException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("IO error detected!", e);
 		} catch (NoSuchFieldException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("NoSuchField error detected!", e);
 		} catch (SecurityException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("Security error detected!", e);
 		}
 	}
@@ -158,14 +160,14 @@ public class BookshopController implements IBookshopController {
 		SerializerUtil.WriteInFile(path);
 	}
 
-	public synchronized void cloneOrder(Integer id) {
+	public void cloneOrder(Integer id) {
 		try {
 			Bookshop.getInstance()
 					.getOrderBase()
 					.add(Bookshop.getInstance().getOrderBase().getById(id)
 							.clone());
 		} catch (CloneNotSupportedException e) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.error("Cannot clone order with id " + id);
 
 		}
@@ -257,7 +259,7 @@ public class BookshopController implements IBookshopController {
 
 	}
 
-	public synchronized String getOrdersString() {
+	public String getOrdersString() {
 		StringBuilder sb = new StringBuilder();
 
 		for (Order order : Bookshop.getInstance().getOrderBase().getOrders()) {
@@ -267,8 +269,7 @@ public class BookshopController implements IBookshopController {
 		return sb.toString();
 	}
 
-	public synchronized double getSumOfExecutedOrders(Date startDate,
-			Date endDate) {
+	public double getSumOfExecutedOrders(Date startDate, Date endDate) {
 		double sum = 0;
 
 		for (Order order : getExecutedOrders(startDate, endDate)) {
@@ -278,7 +279,7 @@ public class BookshopController implements IBookshopController {
 		return sum;
 	}
 
-	private synchronized ArrayList<Order> getExecutedOrders() {
+	private ArrayList<Order> getExecutedOrders() {
 		ArrayList<Order> executed = new ArrayList<Order>();
 		for (Order order : Bookshop.getInstance().getOrderBase().getOrders()) {
 			if (order.getStatus()) {
@@ -288,8 +289,7 @@ public class BookshopController implements IBookshopController {
 		return executed;
 	}
 
-	private synchronized ArrayList<Order> getExecutedOrders(Date startDate,
-			Date endDate) {
+	private ArrayList<Order> getExecutedOrders(Date startDate, Date endDate) {
 		ArrayList<Order> executed = new ArrayList<Order>();
 		for (Order order : getExecutedOrders()) {
 			boolean condition1 = order.getDateOfExecution().after(startDate);
@@ -302,8 +302,7 @@ public class BookshopController implements IBookshopController {
 		return executed;
 	}
 
-	public synchronized String getExecutedOrdersString(Date startDate,
-			Date endDate) {
+	public String getExecutedOrdersString(Date startDate, Date endDate) {
 		StringBuilder sb = new StringBuilder();
 		for (Order order : getExecutedOrders()) {
 			boolean condition1 = order.getDateOfExecution().after(startDate);
@@ -317,25 +316,24 @@ public class BookshopController implements IBookshopController {
 		return sb.toString();
 	}
 
-	public synchronized Integer getNumberOfExecutedOrders(Date startDate,
-			Date endDate) {
+	public Integer getNumberOfExecutedOrders(Date startDate, Date endDate) {
 		return getExecutedOrders(startDate, endDate).size();
 	}
 
-	public synchronized void sortOrdersByDate() {
+	public void sortOrdersByDate() {
 		Bookshop.getInstance().getOrderBase().getOrders()
 				.sort(new OrderDateComparator());
 
 	}
 
-	public synchronized void sortOrdersByExecution() {
+	public void sortOrdersByExecution() {
 		Bookshop.getInstance().getOrderBase().getOrders()
 				.sort(new OrderExecutedComparator());
 
 	}
 
 	@SuppressWarnings("deprecation")
-	public synchronized void markUnclaimedBooks() {
+	public void markUnclaimedBooks() {
 
 		for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
 			if (book.getDateOfAddition() != null) {
@@ -356,17 +354,17 @@ public class BookshopController implements IBookshopController {
 		}
 	}
 
-	public synchronized void sortOrdersByPrice() {
+	public void sortOrdersByPrice() {
 		Bookshop.getInstance().getOrderBase().getOrders()
 				.sort(new OrderPriceComparator());
 
 	}
 
-	public synchronized String getOrderStringById(Integer id) {
+	public String getOrderStringById(Integer id) {
 		return orderToString(Bookshop.getInstance().getOrderBase().getById(id));
 	}
 
-	private synchronized Order getOrderById(Integer id) {
+	private Order getOrderById(Integer id) {
 		return Bookshop.getInstance().getOrderBase().getById(id);
 	}
 
@@ -389,7 +387,7 @@ public class BookshopController implements IBookshopController {
 
 		boolean result = Bookshop.getInstance().getBookBase().delete(id);
 		if (!result) {
-			Logger logger = Logger.getLogger(BookshopController.class);
+
 			logger.warn("Book with id "
 					+ Integer.toString(id)
 					+ "was not deleted. Book is ordered or there is no book with such id.");
@@ -397,7 +395,7 @@ public class BookshopController implements IBookshopController {
 		}
 	}
 
-	public synchronized String getBooks() {
+	public String getBooks() {
 		StringBuilder sb = new StringBuilder();
 		for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
 			sb.append(bookToString(book));
@@ -406,7 +404,7 @@ public class BookshopController implements IBookshopController {
 		return sb.toString();
 	}
 
-	public synchronized String getUnclaimedBooks() {
+	public String getUnclaimedBooks() {
 		StringBuilder sb = new StringBuilder();
 		markUnclaimedBooks();
 		for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
@@ -420,26 +418,26 @@ public class BookshopController implements IBookshopController {
 		return sb.toString();
 	}
 
-	public synchronized void sortBookByPublicationDate() {
+	public void sortBookByPublicationDate() {
 		Collections.sort(Bookshop.getInstance().getBookBase().getBooks(),
 				new BookPublicationDateComparator());
 	}
 
-	public synchronized void sortBookByName() {
+	public void sortBookByName() {
 		Collections.sort(Bookshop.getInstance().getBookBase().getBooks(),
 				new BookNameComparator());
 	}
 
-	public synchronized void sortBookByPrice() {
+	public void sortBookByPrice() {
 		Collections.sort(Bookshop.getInstance().getBookBase().getBooks(),
 				new BookPriceComparator());
 	}
 
-	public synchronized String getBookById(Integer id) {
+	public String getBookById(Integer id) {
 		return bookToString(Bookshop.getInstance().getBookBase().getById(id));
 	}
 
-	public synchronized String getReplies() {
+	public String getReplies() {
 		StringBuilder sb = new StringBuilder();
 		for (Reply reply : Bookshop.getInstance().getReplyBase().getReplies()) {
 			sb.append(replyToString(reply));
@@ -448,12 +446,12 @@ public class BookshopController implements IBookshopController {
 		return sb.toString();
 	}
 
-	public synchronized void sortRepliesByAlphabet() {
+	public void sortRepliesByAlphabet() {
 		Collections.sort(Bookshop.getInstance().getReplyBase().getReplies(),
 				new ReplyAlphabetComparator());
 	}
 
-	public synchronized void sortRepliesByNumber() {
+	public void sortRepliesByNumber() {
 		Collections.sort(Bookshop.getInstance().getReplyBase().getReplies(),
 				new ReplyNumberComparator());
 	}
@@ -464,7 +462,7 @@ public class BookshopController implements IBookshopController {
 
 	}
 
-	public synchronized void markRepliesAsExecuted() {
+	public void markRepliesAsExecuted() {
 
 		for (Reply reply : Bookshop.getInstance().getReplyBase().getReplies()) {
 			for (Book book : Bookshop.getInstance().getBookBase().getBooks()) {
@@ -486,7 +484,7 @@ public class BookshopController implements IBookshopController {
 
 	}
 
-	public synchronized String getReplyById(Integer id) {
+	public String getReplyById(Integer id) {
 		return replyToString(Bookshop.getInstance().getReplyBase().getById(id));
 	}
 
