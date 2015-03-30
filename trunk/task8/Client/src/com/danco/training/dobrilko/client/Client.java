@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+
+import org.apache.log4j.Logger;
+
 import com.danco.training.dobrilko.menu.MenuController;
 
 public class Client {
@@ -11,8 +14,6 @@ public class Client {
 	private String serverIP;
 	private int serverPort;
 	private MenuController menuController;
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
 
 	public Client(String serverIP, int serverPort) {
 		this.serverIP = serverIP;
@@ -21,27 +22,24 @@ public class Client {
 	}
 
 	public void start() {
-		Socket fromServer = null;
 
-		try {
-			fromServer = new Socket(serverIP, serverPort);
-			out = new ObjectOutputStream(fromServer.getOutputStream());
-			in = new ObjectInputStream(fromServer.getInputStream());
+		try (Socket fromServer = new Socket(serverIP, serverPort);
+				ObjectOutputStream out = new ObjectOutputStream(
+						fromServer.getOutputStream());
+				ObjectInputStream in = new ObjectInputStream(
+						fromServer.getInputStream()))
 
-			menuController = new MenuController(out, in);
+		{
+			menuController = new MenuController();
 
 			while (menuController.getExitFlag() != true) {
-				menuController.run();
+				menuController.run(out, in);
 
 			}
 
-			out.close();
-			in.close();
-			fromServer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger logger = Logger.getLogger(Client.class);
+			logger.error("IOException has been caught!", e);
 		}
 	}
-
 }

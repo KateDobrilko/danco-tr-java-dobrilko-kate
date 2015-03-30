@@ -10,9 +10,6 @@ import com.danco.training.dobrilko.ioutil.IOUtil;
 
 public class ShowUnclaimedBooksAction implements IAction {
 
-	
-
-
 	@Override
 	public Command sendCommand() {
 		Command command = null;

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.apache.log4j.Logger;
+
 import com.danco.training.dobrilko.controller.api.IBookshopController;
 import com.danco.training.dobrilko.di.annotation.Inject;
 import com.danco.training.dobrilko.di.enumeration.ControllerClass;
@@ -26,12 +28,8 @@ public class Server {
 
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
-				if (clientSocket.isConnected()) {
-					System.out.println("Client connected...");
-				}
 
-				new ReadWriteThread(clientSocket, bsController)
-						.start();
+				new ReadWriteThread(clientSocket, bsController).start();
 
 			}
 
@@ -42,8 +40,8 @@ public class Server {
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Logger logger = Logger.getLogger(Server.class);
+				logger.error("IOException has been caught!", e);
 			}
 		}
 

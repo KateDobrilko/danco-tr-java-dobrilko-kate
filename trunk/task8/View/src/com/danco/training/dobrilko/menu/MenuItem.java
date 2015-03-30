@@ -42,4 +42,9 @@ public class MenuItem {
 		return title;
 	}
 
+	public IAction getAction() {
+		return action;
+
+	}
+
 }
