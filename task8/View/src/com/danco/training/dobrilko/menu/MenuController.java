@@ -5,23 +5,21 @@ import java.io.ObjectOutputStream;
 
 import com.danco.training.dobrilko.ioutil.IOUtil;
 
-public class MenuController extends Thread {
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
+public class MenuController {
+
+	private Navigator navigator;
 	private boolean exitFlag = false;
 
-	public MenuController(ObjectOutputStream out, ObjectInputStream in) {
-		this.in = in;
-		this.out = out;
-	}
-
-	public void run() {
-
-		Navigator navigator = new Navigator(in, out);
+	public MenuController() {
+		navigator = new Navigator();
 		MenuCreator.createMenu();
 		navigator.setCurrentMenu(MenuCreator.getFirstMenu());
+	}
+
+	public void run(ObjectOutputStream out, ObjectInputStream in) {
+
 		navigator.print();
-		this.exitFlag = !navigator.navigate(IOUtil.readInt());
+		this.exitFlag = !navigator.navigate(IOUtil.readInt(), in, out);
 
 	}
 

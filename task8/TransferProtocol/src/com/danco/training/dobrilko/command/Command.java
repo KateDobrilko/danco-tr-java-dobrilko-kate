@@ -1,7 +1,10 @@
 package com.danco.training.dobrilko.command;
 
-public class Command {
+import java.io.Serializable;
 
+public class Command implements Serializable {
+
+	private static final long serialVersionUID = 2999615629318292587L;
 	private String nameOfMethodToCall;
 	private Object[] args;
 

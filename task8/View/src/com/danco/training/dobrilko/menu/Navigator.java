@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+
+
+import org.apache.log4j.Logger;
+
 import com.danco.training.dobrilko.command.Command;
 import com.danco.training.dobrilko.ioutil.IOUtil;
 
 public class Navigator {
 
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
+	public Navigator() {
 
-	public Navigator(ObjectInputStream in, ObjectOutputStream out) {
-		this.in = in;
-		this.out = out;
 	}
 
 	private Menu currentMenu = new Menu();
@@ -27,19 +27,29 @@ public class Navigator {
 		this.currentMenu = currentMenu;
 	}
 
-	public boolean navigate(int index) {
+	public boolean navigate(int index, ObjectInputStream in,
+			ObjectOutputStream out) {
 		if (this.currentMenu != null) {
 			if ((index < currentMenu.getMenuItems().size()) && (index >= 0)) {
 				try {
-					out.writeObject((this.currentMenu.getItem(index)
-							.sendCommand()));
-					this.currentMenu.getItem(index).receiveAnswer(
-							in.readObject());
+					if (this.currentMenu.getItem(index).getAction() != null) {
+						
+						out.writeObject((this.currentMenu.getItem(index)
+								.sendCommand()));
+						out.flush();
+						
+						if (in.available() != 0) {
+							this.currentMenu.getItem(index).receiveAnswer(
+									in.readObject());
+						}
+					}
 				} catch (IOException | ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				    Logger logger = Logger.getLogger(Logger.class);
+				    logger.error("Exception found!", e);
+					
 				}
 				setCurrentMenu(this.currentMenu.getItem(index).getMenu());
+
 			} else {
 				setCurrentMenu(null);
 			}
@@ -52,8 +62,8 @@ public class Navigator {
 				out.writeObject(new Command("Exit", null));
 				this.currentMenu.getItem(index).receiveAnswer(in.readObject());
 			} catch (IOException | ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				 Logger logger = Logger.getLogger(Logger.class);
+				    logger.error("Exception found!", e);
 			}
 
 			return false;
