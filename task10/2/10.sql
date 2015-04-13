@@ -1,0 +1,1 @@
+SELECT model,MAX(price) FROM printer; 

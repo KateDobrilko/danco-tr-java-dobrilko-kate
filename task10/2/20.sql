@@ -1,0 +1,1 @@
+SELECT maker, c FROM (SELECT COUNT(model) c, model FROM pc GROUP BY model) p INNER JOIN product;
