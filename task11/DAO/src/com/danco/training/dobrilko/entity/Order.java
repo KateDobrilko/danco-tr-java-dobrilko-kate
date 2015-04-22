@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
-import java.sql.DriverManager;
-
 import org.apache.log4j.Logger;
 
 import com.danco.training.dobrilko.dao.DaoFactory;

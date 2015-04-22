@@ -23,7 +23,7 @@ public class MySqlBookDao extends AbstractJDBCDao<Book, Integer> {
 
 	@Override
 	public String getSelectQuery() {
-		return "SELECT id, number, department FROM daotalk.Book";
+		return "SELECT name, author, price, id, dateOfAddition, dateOfPublication, ordered FROM Bookshop.Book";
 	}
 
 	@Override

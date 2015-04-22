@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `book` (
    `ordered` TINYINT(1) NOT NULL ,
    `dateOfPublication` DATE NOT NULL ,
    `dateOfAddition` DATE NULL ,
-   `price` REAL NOT NULL ,
+   `price` REAL NOT NULL ,   
     PRIMARY KEY (`id`) 
   
 );

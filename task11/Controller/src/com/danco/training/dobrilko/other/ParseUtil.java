@@ -1,14 +1,24 @@
 package com.danco.training.dobrilko.other;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.danco.training.dobrilko.bookshop.Bookshop;
+import org.apache.log4j.Logger;
+
+import com.danco.training.dobrilko.dao.DaoFactory;
+import com.danco.training.dobrilko.dao.GenericDao;
+import com.danco.training.dobrilko.dao.PersistException;
 import com.danco.training.dobrilko.entity.Book;
 import com.danco.training.dobrilko.entity.Order;
 import com.danco.training.dobrilko.entity.Reply;
+import com.danco.training.dobrilko.mysql.MySqlDaoFactory;
 
 public class ParseUtil {
+	private static DaoFactory<Connection> factory = new MySqlDaoFactory();
+	private static Connection connection;
+	private static Logger logger = Logger.getLogger(ParseUtil.class);
+
 	public static Book parseBookString(String bookString) {
 		String[] parsedString = bookString.split(";");
 		Book book = null;
@@ -28,58 +38,74 @@ public class ParseUtil {
 			Date cur = new Date(curYear, curMonth, curDay);
 			@SuppressWarnings("deprecation")
 			Date pub = new Date(pubYear, pubMonth, pubDay);
-			book = new Book(name, author, price, id, cur, pub);
+			book = new Book(name, author, price, id, cur, pub, false);
 		}
 
 		return book;
 
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	public static Order parseOrderString(String orderString) {
 		String[] strings = orderString.split(System.lineSeparator());
 		String[] orderDescription;
 		ArrayList<Book> books = new ArrayList<Book>();
-		if (strings.length > 1) {
-			orderDescription = strings[0].split(";");
-			Date date;
-			int id;
-			int numberOfBooks;
-			if (orderDescription.length < 4) {
-				id = Integer.parseInt(orderDescription[0]);
-				numberOfBooks = Integer.parseInt(orderDescription[1]);
-				boolean status = orderDescription[2].equals("true");
-				date = null;
-				for (int i = 1; i <= numberOfBooks; i++) {
-					int bookId = Integer.parseInt(strings[i].split(";")[0]);
-					books.add(Bookshop.getInstance().getBookBase()
-							.getById(bookId));
-				}
-				return new Order(id, books, status, date);
-			}
+		try {
+			connection = factory.getContext();
+		} catch (PersistException e1) {
 
-			else {
-				id = Integer.parseInt(orderDescription[0]);
-				numberOfBooks = Integer.parseInt(orderDescription[1]);
-				boolean status = orderDescription[2].equals("true");
-				int year = Integer.parseInt(orderDescription[3]);
-				int month = Integer.parseInt(orderDescription[4]);
-				int day = Integer.parseInt(orderDescription[5]);
-				date = new Date(year, month, day);
-				for (int i = 1; i <= numberOfBooks; i++) {
-					int bookId = Integer.parseInt(strings[i].split(";")[0]);
-					books.add(Bookshop.getInstance().getBookBase()
-							.getById(bookId));
-				}
-				return new Order(id, books, status, date);
-			}
+		}
 
-		} else {
+		GenericDao<Book, Integer> dao;
+		try {
+
+			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
+					Book.class));
+
+			if (strings.length > 1) {
+				orderDescription = strings[0].split(";");
+				Date date;
+				int id;
+				int numberOfBooks;
+				if (orderDescription.length < 4) {
+					id = Integer.parseInt(orderDescription[0]);
+					numberOfBooks = Integer.parseInt(orderDescription[1]);
+					boolean status = orderDescription[2].equals("true");
+					date = null;
+					for (int i = 1; i < 2; i++) {
+						int bookId = Integer.parseInt(strings[i].split(";")[0]);
+						books.add(dao.getByPK(bookId));
+					}
+					return new Order(id, books.get(0).getId(), status, date);
+				}
+
+				else {
+					id = Integer.parseInt(orderDescription[0]);
+					numberOfBooks = Integer.parseInt(orderDescription[1]);
+					boolean status = orderDescription[2].equals("true");
+					int year = Integer.parseInt(orderDescription[3]);
+					int month = Integer.parseInt(orderDescription[4]);
+					int day = Integer.parseInt(orderDescription[5]);
+					date = new Date(year, month, day);
+					for (int i = 1; i <= numberOfBooks; i++) {
+						int bookId = Integer.parseInt(strings[i].split(";")[0]);
+						books.add(dao.getByPK(bookId));
+					}
+					return new Order(id, books.get(0).getId(), status, date);
+				}
+
+			} else {
+				return null;
+			}
+		} catch (PersistException e) {
+			logger.error(e);
 			return null;
 		}
+
 	}
 
 	public static Reply parseReplyString(String replyString) {
+
 		String[] strings = replyString.split(System.lineSeparator());
 		String[] replyDescription;
 		if (strings.length > 1) {
@@ -88,7 +114,7 @@ public class ParseUtil {
 			int numberOfRequests = Integer.parseInt(replyDescription[1]);
 			boolean executed = replyDescription[2].equals("true");
 			Book book = parseBookString(strings[1]);
-			return new Reply(book, numberOfRequests, id, executed);
+			return new Reply(book.getId(), numberOfRequests, id, executed);
 		} else {
 			return null;
 		}
@@ -133,42 +159,63 @@ public class ParseUtil {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	public static String orderToString(Order order) {
+
 		StringBuilder sb = new StringBuilder();
-		sb.append(Integer.toString(order.getId()));
-		sb.append(";");
-		if (order.getDateOfExecution() != null) {
-			Date doe = order.getDateOfExecution();
-			sb.append(Integer.toString(doe.getDate()));
+		GenericDao<Book, Integer> dao;
+
+		try {
+			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
+					Book.class));
+
+			sb.append(Integer.toString(order.getId()));
 			sb.append(";");
-			sb.append(Integer.toString(doe.getMonth()));
-			sb.append(";");
-			sb.append(Integer.toString(doe.getYear()));
-		}
-		sb.append(System.lineSeparator());
-		for (Book book : order.getBooks()) {
-			sb.append(bookToString(book));
+			if (order.getDateOfExecution() != null) {
+				Date doe = order.getDateOfExecution();
+				sb.append(Integer.toString(doe.getDate()));
+				sb.append(";");
+				sb.append(Integer.toString(doe.getMonth()));
+				sb.append(";");
+				sb.append(Integer.toString(doe.getYear()));
+			}
 			sb.append(System.lineSeparator());
+			for (Book book : dao.getAll()) {
+				sb.append(bookToString(book));
+				sb.append(System.lineSeparator());
+			}
+		} catch (PersistException e) {
+			logger.error(e);
 		}
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static String replyToString(Reply reply) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("'");
-		sb.append(Integer.toString(reply.getId()));
-		sb.append("';");
-		sb.append(bookToString(reply.getBook()));
-		sb.append(";'");
-		sb.append(Integer.toString(reply.getNumberOfRequests()));
-		sb.append("';'");
-		if (reply.isExecuted()) {
-			sb.append("executed'");
-		} else {
-			sb.append("not executed'");
+		GenericDao<Book, Integer> dao;
+
+		try {
+			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
+					Book.class));
+			sb.append("'");
+			sb.append(Integer.toString(reply.getId()));
+			sb.append("';");
+
+			sb.append(bookToString(dao.getByPK(reply.getBookId())));
+
+			sb.append(";'");
+			sb.append(Integer.toString(reply.getNumberOfRequests()));
+			sb.append("';'");
+			if (reply.isExecuted()) {
+				sb.append("executed'");
+			} else {
+				sb.append("not executed'");
+			}
+			sb.append(System.lineSeparator());
+		} catch (PersistException e) {
+			logger.error(e);
 		}
-		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
 
