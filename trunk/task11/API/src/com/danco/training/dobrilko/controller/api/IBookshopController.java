@@ -3,23 +3,8 @@ package com.danco.training.dobrilko.controller.api;
 import java.util.Date;
 
 public interface IBookshopController {
-	public void readOrdersFromFile();
-
-	public void readBooksFromFile();
-
-	public void readRepliesFromFile();
-
-	public void writeOrdersWithReflection();
-
-	public void writeRepliesWithReflection();
-
-	public void writeBooksWithReflection();
 
 	public double getSumOfExecutedOrders(Date startDate, Date endDate);
-
-	public void readFromFile(String path);
-
-	public void writeInFile(String path);
 
 	public void cloneOrder(Integer id);
 
