@@ -1,12 +1,10 @@
 package com.danco.training.dobrilko.entity;
 
-import java.io.Serializable;
 import java.util.Date;
 
-import com.danco.training.dobrilko.daoentity.Identified;
+import com.danco.training.dobrilko.daoentity.PKHolder;
 
-public class Book implements Serializable, Cloneable, Identified<Integer> {
-	private static final long serialVersionUID = 731457861374086264L;
+public class Book implements Cloneable, PKHolder<Integer> {
 	private int id;
 	private String name;
 	private String author;
@@ -15,13 +13,15 @@ public class Book implements Serializable, Cloneable, Identified<Integer> {
 	private Date dateOfPublication;
 	private Date dateOfAddition;
 	private double price;
+	private Order order;
 
 	public Book() {
 
 	}
 
 	public Book(String name, String author, double price, int id,
-			Date dateOfAddition, Date dateOfPublication, boolean ordered) {
+			Date dateOfAddition, Date dateOfPublication, boolean ordered,
+			Order order) {
 		this.name = name;
 		this.ordered = ordered;
 		this.author = author;
@@ -29,6 +29,7 @@ public class Book implements Serializable, Cloneable, Identified<Integer> {
 		this.dateOfPublication = dateOfPublication;
 		this.id = id;
 		this.price = price;
+		this.order = order;
 
 	}
 
@@ -108,6 +109,14 @@ public class Book implements Serializable, Cloneable, Identified<Integer> {
 		book.setId(this.id);
 		return book;
 
+	}
+
+	public Order getOrder() {
+		return order;
+	}
+
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
 }

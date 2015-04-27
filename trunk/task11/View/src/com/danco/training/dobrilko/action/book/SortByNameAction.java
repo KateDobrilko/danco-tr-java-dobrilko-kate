@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import com.danco.training.dobrilko.action.IAction;
 import com.danco.training.dobrilko.command.Command;
+import com.danco.training.dobrilko.ioutil.IOUtil;
 
 public class SortByNameAction implements IAction {
 
@@ -27,5 +28,9 @@ public class SortByNameAction implements IAction {
 
 	@Override
 	public void receiveAnswer(Object answerFromServer) {
+		if (answerFromServer instanceof String) {
+			IOUtil.print((String) answerFromServer);
+			IOUtil.println();
+		}
 	}
 }

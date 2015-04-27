@@ -9,9 +9,9 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import com.danco.training.dobrilko.connection.ConnectionManager;
 import com.danco.training.dobrilko.controller.api.IBookshopController;
 import com.danco.training.dobrilko.controller.property.PropertyStorage;
-import com.danco.training.dobrilko.dao.DaoFactory;
 import com.danco.training.dobrilko.dao.GenericDao;
 import com.danco.training.dobrilko.dao.PersistException;
 import com.danco.training.dobrilko.entity.Book;
@@ -20,101 +20,108 @@ import com.danco.training.dobrilko.entity.Reply;
 
 import static com.danco.training.dobrilko.other.ParseUtil.*;
 
-import com.danco.training.dobrilko.mysql.MySqlDaoFactory;
+import com.danco.training.dobrilko.mysql.MySqlBookDao;
+import com.danco.training.dobrilko.mysql.MySqlOrderDao;
+import com.danco.training.dobrilko.mysql.MySqlReplyDao;
 
 public class BookshopController implements IBookshopController {
 
 	private Logger logger = Logger.getLogger(BookshopController.class);
-	private DaoFactory<Connection> factory = new MySqlDaoFactory();
+
 	private Connection connection;
 
 	public BookshopController() {
+
+	}
+
+
+	public void cloneOrder(Integer id) {
+
+		GenericDao<Order, Integer> dao = new MySqlOrderDao();
+		;
 		try {
-			connection = factory.getContext();
+
+			Connection connection = ConnectionManager.getConnection();
 			connection.setAutoCommit(false);
+			dao.persist(dao.getByPK(id, connection).clone(), connection);
+			connection.commit();
+		} catch (PersistException | CloneNotSupportedException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+
+	}
+
+	
+	public synchronized void addOrder(String orderString) {
+
+		GenericDao<Order, Integer> dao = new MySqlOrderDao();
+		try {
+
+			dao.create(ConnectionManager.getConnection());
+		} catch (PersistException e) {
+			logger.error(e);
+		}
+
+	}
+
+	public synchronized void cancelOrder(Integer id) {
+
+		GenericDao<Order, Integer> daoOrder;
+		GenericDao<Book, Integer> daoBook;
+		Connection connection = ConnectionManager.getConnection();
+
+		try {
+			connection.setAutoCommit(false);
+			daoOrder = new MySqlOrderDao();
+			daoBook = new MySqlBookDao();
+			Order order = daoOrder.getByPK(id, connection);
+			if (order.getStatus()) {
+				for (Book book : daoBook.getAll("id", connection)) {
+					book.setOrdered(false);
+				}
+				daoOrder.delete(daoOrder.getByPK(id, connection), connection);
+				connection.commit();
+
+			} else {
+				connection.rollback();
+				Logger logger = Logger.getLogger(BookshopController.class);
+				logger.warn("Order with id:" + Integer.toString(id)
+						+ " is already executed.");
+
+			}
 		} catch (PersistException | SQLException e) {
 			logger.error(e);
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
-	public void cloneOrder(Integer id) {
-
-		GenericDao<Order, Integer> dao;
-		try {
-			dao = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
-			dao.persist(dao.getByPK(id).clone());
-		} catch (PersistException | CloneNotSupportedException e) {
-			logger.error(e);
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	public synchronized void addOrder(String orderString) {
-
-		GenericDao<Order, Integer> dao;
-		try {
-			dao = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
-			dao.create();
-		} catch (PersistException e) {
-			logger.error(e);
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	public synchronized void cancelOrder(Integer id) {
-
-		GenericDao<Order, Integer> daoOrder;
-		GenericDao<Book, Integer> daoBook;
-
-		try {
-			daoOrder = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
-
-			daoBook = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
-			Order order = getOrderById(id);
-			if (order.getStatus()) {
-				for (Book book : daoBook.getAll()) {
-					book.setOrdered(false);
-				}
-				daoOrder.delete(daoOrder.getByPK(id));
-
-			} else {
-				Logger logger = Logger.getLogger(BookshopController.class);
-				logger.warn("Order with id:" + Integer.toString(id)
-						+ " is already executed.");
-
-			}
-		} catch (PersistException e) {
-			logger.error(e);
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
+	
 	public synchronized void executeOrder(Integer id) {
 
-		GenericDao<Order, Integer> daoOrder;
-		GenericDao<Book, Integer> daoBook;
+		GenericDao<Order, Integer> daoOrder = new MySqlOrderDao();
+		GenericDao<Book, Integer> daoBook = new MySqlBookDao();
+		Connection connection = ConnectionManager.getConnection();
 
 		try {
-			daoOrder = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
+			connection.setAutoCommit(false);
 
-			daoBook = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
+			Order order = daoOrder.getByPK(id, connection);
+			for (Book b : daoBook.getAll("id", connection)) {
+				if (b.getOrder().equals(order)) {
+					order.setSum(order.getSum() + b.getPrice());
+					daoBook.delete(daoBook.getByPK(b.getId(), connection),
+							connection);
+				}
+			}
 
-			Order order = daoOrder.getByPK(id);
-			daoBook.delete(daoBook.getByPK(order.getBookId()));
 			order.setStatus(true);
 			order.setDateOfExecution(new Date());
-			daoOrder.update(order);
+			daoOrder.update(order, connection);
 			connection.commit();
 		} catch (PersistException | SQLException e) {
 			try {
@@ -127,15 +134,17 @@ public class BookshopController implements IBookshopController {
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public String getOrdersString() {
 		StringBuilder sb = new StringBuilder();
 
-		GenericDao<Order, Integer> dao;
+		GenericDao<Order, Integer> daoOrder = new MySqlOrderDao();
+
+		Connection connection = ConnectionManager.getConnection();
+
 		try {
-			dao = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
-			for (Order order : dao.getAll()) {
+			connection.setAutoCommit(false);
+			for (Order order : daoOrder.getAll("id", connection)) {
 				sb.append(orderToString(order));
 				sb.append(System.lineSeparator());
 			}
@@ -161,17 +170,17 @@ public class BookshopController implements IBookshopController {
 		return sum;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	private ArrayList<Order> getExecutedOrders() {
 
 		ArrayList<Order> executed = new ArrayList<Order>();
 
 		GenericDao<Order, Integer> dao;
+		Connection connection = ConnectionManager.getConnection();
 		try {
-			dao = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
+			dao = new MySqlOrderDao();
 
-			for (Order order : dao.getAll()) {
+			for (Order order : dao.getAll("id", connection)) {
 				if (order.getStatus()) {
 					executed.add(order);
 				}
@@ -213,29 +222,65 @@ public class BookshopController implements IBookshopController {
 		return getExecutedOrders(startDate, endDate).size();
 	}
 
-	public void sortOrdersByDate() {
-		/*
-		 * Bookshop.getInstance().getOrderBase().getOrders() .sort(new
-		 * OrderDateComparator());
-		 */
-	}
+	public String sortOrdersByDate() {
+		StringBuilder sb = new StringBuilder();
 
-	public void sortOrdersByExecution() {
-		/*
-		 * Bookshop.getInstance().getOrderBase().getOrders() .sort(new
-		 * OrderExecutedComparator());
-		 */
+		GenericDao<Order, Integer> daoOrder = new MySqlOrderDao();
 
-	}
+		Connection connection = ConnectionManager.getConnection();
 
-	@SuppressWarnings({ "deprecation", "unchecked" })
-	public void markUnclaimedBooks() {
-		GenericDao<Book, Integer> dao;
 		try {
-			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
+			connection.setAutoCommit(false);
+			for (Order order : daoOrder.getAll("dateOfExecution", connection)) {
+				sb.append(orderToString(order));
+				sb.append(System.lineSeparator());
+			}
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+		return sb.toString();
 
-			for (Book book : dao.getAll()) {
+	}
+
+	public String sortOrdersByExecution() {
+		StringBuilder sb = new StringBuilder();
+
+		GenericDao<Order, Integer> daoOrder = new MySqlOrderDao();
+
+		Connection connection = ConnectionManager.getConnection();
+
+		try {
+			connection.setAutoCommit(false);
+			for (Order order : daoOrder.getAll("status", connection)) {
+				sb.append(orderToString(order));
+				sb.append(System.lineSeparator());
+			}
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+		return sb.toString();
+	}
+
+	
+	@SuppressWarnings("deprecation")
+	public void markUnclaimedBooks(Connection connection) {
+		GenericDao<Book, Integer> dao;
+
+		dao = new MySqlBookDao();
+		try {
+			for (Book book : dao.getAll("id", connection)) {
 				if (book.getDateOfAddition() != null) {
 					Date date = new Date();
 
@@ -250,100 +295,119 @@ public class BookshopController implements IBookshopController {
 							.getMonthsToMarkUnclaimed()) {
 						book.setUnclaimed(true);
 					}
+
+					dao.update(book, connection);
 				}
 			}
 		} catch (PersistException e) {
 			logger.error(e);
 		}
-	}
-
-	public void sortOrdersByPrice() {
-		/*
-		 * Bookshop.getInstance().getOrderBase().getOrders() .sort(new
-		 * OrderPriceComparator());
-		 */
 
 	}
 
-	@SuppressWarnings("unchecked")
+	public String sortOrdersByPrice() {
+		StringBuilder sb = new StringBuilder();
+
+		GenericDao<Order, Integer> daoOrder = new MySqlOrderDao();
+
+		Connection connection = ConnectionManager.getConnection();
+
+		try {
+			connection.setAutoCommit(false);
+			for (Order order : daoOrder.getAll("sum", connection)) {
+				sb.append(orderToString(order));
+				sb.append(System.lineSeparator());
+			}
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+		return sb.toString();
+
+	}
+
+	
 	public String getOrderStringById(Integer id) {
 		GenericDao<Order, Integer> dao;
+		Connection connection = ConnectionManager.getConnection();
 		String out = null;
 		try {
 
-			dao = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
-			out = orderToString(dao.getByPK(id));
+			dao = new MySqlOrderDao();
+			out = orderToString(dao.getByPK(id, connection));
 		} catch (PersistException e) {
 			logger.error(e);
 		}
 		return out;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Order getOrderById(Integer id) {
-
-		GenericDao<Order, Integer> dao;
-		Order order = null;
-		try {
-			dao = (GenericDao<Order, Integer>) (factory.getDao(connection,
-					Order.class));
-
-			order = dao.getByPK(id);
-		} catch (PersistException e) {
-			logger.error(e);
-		}
-		return order;
-	}
-
-	@SuppressWarnings("unchecked")
+	
 	public synchronized void addBook(String bookString) {
 
 		GenericDao<Book, Integer> dao;
+		Connection connection = ConnectionManager.getConnection();
 
 		try {
-			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
+			connection.setAutoCommit(false);
+			dao = new MySqlBookDao();
 
 			if (PropertyStorage.getInstance().getMarkRepliesAsExecuted()) {
-				dao.persist(parseBookString(bookString));
-				markRepliesAsExecuted();
+				dao.persist(parseBookString(bookString), connection);
+				markRepliesAsExecuted(connection);
 			}
 
 			else {
-				dao.persist(parseBookString(bookString));
+				dao.persist(parseBookString(bookString), connection);
 			}
-		} catch (PersistException e) {
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e1);
+			}
 			logger.error(e);
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public synchronized void deleteBook(Integer id) {
 
 		GenericDao<Book, Integer> dao;
+		Connection connection = ConnectionManager.getConnection();
 		try {
-			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
+			connection.setAutoCommit(false);
+			dao = new MySqlBookDao();
 
-			dao.delete(dao.getByPK(id));
-		} catch (PersistException e) {
+			dao.delete(dao.getByPK(id, connection), connection);
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e1);
+			}
 			logger.error(e);
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public String getBooks() {
 		StringBuilder sb = new StringBuilder();
 
 		GenericDao<Book, Integer> dao;
+		Connection connection = ConnectionManager.getConnection();
 
 		try {
-			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
-			for (Book book : dao.getAll()) {
+			dao = new MySqlBookDao();
+			for (Book book : dao.getAll("id", connection)) {
 				sb.append(bookToString(book));
 				sb.append(System.lineSeparator());
 			}
@@ -354,61 +418,122 @@ public class BookshopController implements IBookshopController {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("unchecked")
 	public String getUnclaimedBooks() {
 		StringBuilder sb = new StringBuilder();
-		markUnclaimedBooks();
+		Connection connection = ConnectionManager.getConnection();
+
 		GenericDao<Book, Integer> dao;
 		try {
-			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
+			connection.setAutoCommit(false);
+			markUnclaimedBooks(connection);
+			dao = new MySqlBookDao();
 
-			for (Book book : dao.getAll()) {
+			for (Book book : dao.getAll("id", connection)) {
 				if (book.isUnclaimed()) {
 					sb.append(bookToString(book));
 					sb.append(System.lineSeparator());
 
 				}
 			}
-		} catch (PersistException e) {
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e1);
+			}
 			logger.error(e);
 		}
 
 		return sb.toString();
 	}
 
-	public void sortBookByPublicationDate() {
-		/*
-		 * Collections.sort(Bookshop.getInstance().getBookBase().getBooks(), new
-		 * BookPublicationDateComparator());
-		 */
+	public String sortBookByPublicationDate() {
+		StringBuilder sb = new StringBuilder();
+
+		GenericDao<Book, Integer> daoBook = new MySqlBookDao();
+
+		Connection connection = ConnectionManager.getConnection();
+
+		try {
+			connection.setAutoCommit(false);
+			for (Book book : daoBook.getAll("dateOfPublication", connection)) {
+				sb.append(bookToString(book));
+				sb.append(System.lineSeparator());
+			}
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+		return sb.toString();
 	}
 
-	public void sortBookByName() {
-		/*
-		 * Collections.sort(Bookshop.getInstance().getBookBase().getBooks(), new
-		 * BookNameComparator());
-		 */
+	public String sortBookByName() {
+		StringBuilder sb = new StringBuilder();
+
+		GenericDao<Book, Integer> daoBook = new MySqlBookDao();
+
+		Connection connection = ConnectionManager.getConnection();
+
+		try {
+			connection.setAutoCommit(false);
+			for (Book book : daoBook.getAll("name", connection)) {
+				sb.append(bookToString(book));
+				sb.append(System.lineSeparator());
+			}
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+		return sb.toString();
 	}
 
-	public void sortBookByPrice() {
-		/*
-		 * Collections.sort(Bookshop.getInstance().getBookBase().getBooks(), new
-		 * BookPriceComparator());
-		 */
+	public String sortBookByPrice() {
+		StringBuilder sb = new StringBuilder();
+
+		GenericDao<Book, Integer> daoBook = new MySqlBookDao();
+
+		Connection connection = ConnectionManager.getConnection();
+
+		try {
+			connection.setAutoCommit(false);
+			for (Book book : daoBook.getAll("price", connection)) {
+				sb.append(bookToString(book));
+				sb.append(System.lineSeparator());
+			}
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+		return sb.toString();
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public String getBookById(Integer id) {
 		String bookString = null;
 
 		GenericDao<Book, Integer> dao;
 
 		try {
-			dao = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
+			dao = new MySqlBookDao();
 
-			bookString = bookToString(dao.getByPK(id));
+			bookString = bookToString(dao.getByPK(id,
+					ConnectionManager.getConnection()));
 		} catch (PersistException e) {
 			logger.error(e);
 		}
@@ -416,16 +541,16 @@ public class BookshopController implements IBookshopController {
 		return bookString;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public String getReplies() {
 		StringBuilder sb = new StringBuilder();
 
 		GenericDao<Reply, Integer> dao;
 
 		try {
-			dao = (GenericDao<Reply, Integer>) (factory.getDao(connection,
-					Reply.class));
-			for (Reply reply : dao.getAll()) {
+			dao = new MySqlReplyDao();
+			for (Reply reply : dao.getAll("id",
+					ConnectionManager.getConnection())) {
 				sb.append(replyToString(reply));
 				sb.append(System.lineSeparator());
 			}
@@ -438,28 +563,43 @@ public class BookshopController implements IBookshopController {
 	}
 
 	public void sortRepliesByAlphabet() {
-		/*
-		 * Collections.sort(Bookshop.getInstance().getReplyBase().getReplies(),
-		 * new ReplyAlphabetComparator());
-		 */
+
 	}
 
-	public void sortRepliesByNumber() {
-		/*
-		 * Collections.sort(Bookshop.getInstance().getReplyBase().getReplies(),
-		 * new ReplyNumberComparator());
-		 */
+	public String sortRepliesByNumber() {
+		StringBuilder sb = new StringBuilder();
+
+		GenericDao<Reply, Integer> daoReply = new MySqlReplyDao();
+
+		Connection connection = ConnectionManager.getConnection();
+
+		try {
+			connection.setAutoCommit(false);
+			for (Reply reply : daoReply.getAll("numberOfRequests", connection)) {
+				sb.append(replyToString(reply));
+				sb.append(System.lineSeparator());
+			}
+			connection.commit();
+		} catch (PersistException | SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error(e);
+			}
+			logger.error(e);
+		}
+		return sb.toString();
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public synchronized void addReply(String replyString) {
 
 		GenericDao<Reply, Integer> dao;
 
 		try {
-			dao = (GenericDao<Reply, Integer>) (factory.getDao(connection,
-					Reply.class));
-			dao.persist(parseReplyString(replyString));
+			dao = new MySqlReplyDao();
+			dao.persist(parseReplyString(replyString),
+					ConnectionManager.getConnection());
 
 		} catch (PersistException e) {
 			logger.error(e);
@@ -467,21 +607,19 @@ public class BookshopController implements IBookshopController {
 
 	}
 
-	@SuppressWarnings("unchecked")
-	public void markRepliesAsExecuted() {
+	
+	public void markRepliesAsExecuted(Connection connection) {
 		GenericDao<Book, Integer> daoBook;
 		GenericDao<Reply, Integer> daoReply;
 
 		try {
-			daoReply = (GenericDao<Reply, Integer>) (factory.getDao(connection,
-					Reply.class));
+			daoReply = new MySqlReplyDao();
 
-			daoBook = (GenericDao<Book, Integer>) (factory.getDao(connection,
-					Book.class));
-			for (Reply reply : daoReply.getAll()) {
-				for (Book book : daoBook.getAll()) {
+			daoBook = new MySqlBookDao();
+			for (Reply reply : daoReply.getAll("id", connection)) {
+				for (Book book : daoBook.getAll("id", connection)) {
 
-					Book book1 = daoBook.getByPK(reply.getBookId());
+					Book book1 = daoBook.getByPK(reply.getId(), connection);
 					boolean condition = ((book1.getAuthor().equals(book
 							.getAuthor()))
 							&& (book1.getName().equals(book.getName()))
@@ -491,28 +629,29 @@ public class BookshopController implements IBookshopController {
 							.isExecuted()));
 					if (condition) {
 
-						reply.setBookId(book.getId());
+						reply.setBook(daoBook.getByPK(book.getId(), connection));
 						reply.setExecuted(true);
-						daoReply.update(reply);
+						daoReply.update(reply, connection);
 
 					}
 				}
 			}
+
 		} catch (PersistException e) {
 			logger.error(e);
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public String getReplyById(Integer id) {
 
 		GenericDao<Reply, Integer> dao;
 		String replyString = null;
 		try {
-			dao = (GenericDao<Reply, Integer>) (factory.getDao(connection,
-					Reply.class));
-			replyString = replyToString(dao.getByPK(id));
+			dao = new MySqlReplyDao();
+			replyString = replyToString(dao.getByPK(id,
+					ConnectionManager.getConnection()));
 		} catch (PersistException e) {
 			logger.error(e);
 		}
