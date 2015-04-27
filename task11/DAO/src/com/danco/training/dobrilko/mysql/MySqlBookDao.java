@@ -4,37 +4,51 @@ import com.danco.training.dobrilko.dao.AbstractJDBCDao;
 import com.danco.training.dobrilko.dao.PersistException;
 import com.danco.training.dobrilko.entity.Book;
 
+
+
+import com.danco.training.dobrilko.entity.Order;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class MySqlBookDao extends AbstractJDBCDao<Book, Integer> {
 
-	private class PersistBook extends Book {
-		
-		private static final long serialVersionUID = 4641921138250005105L;
-
-		public void setId(int id) {
-			super.setId(id);
-		}
-	}
+	private Logger logger = Logger.getLogger(MySqlBookDao.class);
 
 	@Override
-	public String getSelectQuery() {
-		return "SELECT name, author, price, id, dateOfAddition, dateOfPublication, ordered FROM Bookshop.Book";
+	public String getSelectQuery(String parameterName) {
+
+		StringBuilder sb = new StringBuilder();
+		try {
+			Book.class.getDeclaredField(parameterName);
+			sb.append("SELECT name, author, price, id, dateOfAddition, dateOfPublication, ordered, unclaimed, orderId FROM Bookshop.Book ORDER BY ");
+			sb.append(parameterName);
+			sb.append(";");
+
+		} catch (NoSuchFieldException e) {
+			logger.error(e);
+		} catch (SecurityException e) {
+			logger.error(e);
+		}
+
+		return sb.toString();
+
 	}
 
 	@Override
 	public String getCreateQuery() {
-		return "INSERT INTO Bookshop.book (name, author, price, id, dateOfAddition, dateOfPublication, ordered) \n"
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?);";
+		return "INSERT INTO Bookshop.book (name, author, price, id, dateOfAddition, dateOfPublication, ordered, orderId) \n"
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 	}
 
 	@Override
 	public String getUpdateQuery() {
-		return "UPDATE Bookshop.book SET name=? author=? price=?  dateOfAddition=? dateOfPublication=? ordered=? WHERE id= ?;";
+		return "UPDATE Bookshop.book SET name=? author=? price=?  dateOfAddition=? dateOfPublication=? ordered=? orderId=? WHERE id= ?;";
 	}
 
 	@Override
@@ -43,13 +57,13 @@ public class MySqlBookDao extends AbstractJDBCDao<Book, Integer> {
 	}
 
 	@Override
-	public Book create() throws PersistException {
+	public Book create(Connection connection) throws PersistException {
 		Book g = new Book();
-		return persist(g);
+		return persist(g, connection);
 	}
 
-	public MySqlBookDao(Connection connection) {
-		super(connection);
+	public MySqlBookDao() {
+		super();
 	}
 
 	@Override
@@ -57,16 +71,19 @@ public class MySqlBookDao extends AbstractJDBCDao<Book, Integer> {
 		LinkedList<Book> result = new LinkedList<Book>();
 		try {
 			while (rs.next()) {
-				PersistBook Book = new PersistBook();
-				Book.setId(rs.getInt("id"));
-				Book.setName(rs.getString("name"));
-				Book.setAuthor(rs.getString("author"));
-				Book.setUnclaimed(rs.getBoolean("unclaimed"));
-				Book.setOrdered(rs.getBoolean("ordered"));
-				Book.setDateOfAddition(rs.getDate("dateOfAddition"));
-				Book.setDateOfPublication(rs.getDate("dateOfPublication"));
-				Book.setPrice(rs.getDouble("price"));
-				result.add(Book);
+				Book book = new Book();
+				book.setId(rs.getInt("id"));
+				book.setName(rs.getString("name"));
+				book.setAuthor(rs.getString("author"));
+				book.setUnclaimed(rs.getBoolean("unclaimed"));
+				book.setOrdered(rs.getBoolean("ordered"));
+				book.setDateOfAddition(rs.getDate("dateOfAddition"));
+				book.setDateOfPublication(rs.getDate("dateOfPublication"));
+				book.setPrice(rs.getDouble("price"));
+				Order order = new Order();
+				order.setId(rs.getInt("orderId"));
+				book.setOrder(new Order());
+				result.add(book);
 			}
 		} catch (Exception e) {
 			throw new PersistException(e);
@@ -105,9 +122,12 @@ public class MySqlBookDao extends AbstractJDBCDao<Book, Integer> {
 			statement.setDate(6, new java.sql.Date(object
 					.getDateOfPublication().getTime()));
 			statement.setBoolean(7, object.isOrdered());
+			statement.setInt(8, object.getOrder().getId());
 		} catch (Exception e) {
 			throw new PersistException(e);
 		}
 	}
+
+	
 
 }

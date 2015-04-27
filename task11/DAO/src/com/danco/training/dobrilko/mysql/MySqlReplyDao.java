@@ -2,6 +2,7 @@ package com.danco.training.dobrilko.mysql;
 
 import com.danco.training.dobrilko.dao.AbstractJDBCDao;
 import com.danco.training.dobrilko.dao.PersistException;
+import com.danco.training.dobrilko.entity.Book;
 import com.danco.training.dobrilko.entity.Reply;
 
 import java.sql.Connection;
@@ -10,22 +11,29 @@ import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class MySqlReplyDao extends AbstractJDBCDao<Reply, Integer> {
 
-	private class PersistReply extends Reply {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 4641921138250005105L;
-
-		public void setId(int id) {
-			super.setId(id);
-		}
-	}
+	private Logger logger = Logger.getLogger(MySqlBookDao.class);
 
 	@Override
-	public String getSelectQuery() {
-		return "SELECT bookId, numberOfRequests,  id,  executed FROM Bookshop.Reply";
+	public String getSelectQuery(String parameterName) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			Reply.class.getDeclaredField(parameterName);
+			sb.append("SELECT bookId, numberOfRequests,  id,  executed FROM Bookshop.Reply ORDER BY ");
+			sb.append(parameterName);
+			sb.append(";");
+
+		} catch (NoSuchFieldException e) {
+			logger.error(e);
+		} catch (SecurityException e) {
+			logger.error(e);
+		}
+
+		return sb.toString();
+
 	}
 
 	@Override
@@ -45,13 +53,13 @@ public class MySqlReplyDao extends AbstractJDBCDao<Reply, Integer> {
 	}
 
 	@Override
-	public Reply create() throws PersistException {
+	public Reply create(Connection connection) throws PersistException {
 		Reply g = new Reply();
-		return persist(g);
+		return persist(g, connection);
 	}
 
-	public MySqlReplyDao(Connection connection) {
-		super(connection);
+	public MySqlReplyDao() {
+		super();
 	}
 
 	@Override
@@ -59,12 +67,14 @@ public class MySqlReplyDao extends AbstractJDBCDao<Reply, Integer> {
 		LinkedList<Reply> result = new LinkedList<Reply>();
 		try {
 			while (rs.next()) {
-				PersistReply Reply = new PersistReply();
-				Reply.setId(rs.getInt("id"));
-				Reply.setNumberOfRequests(rs.getInt("numberOfRequests"));
-				Reply.setExecuted(rs.getBoolean("executed"));
-				Reply.setBookId(rs.getInt("bookId"));
-				result.add(Reply);
+				Reply reply = new Reply();
+				reply.setId(rs.getInt("id"));
+				reply.setNumberOfRequests(rs.getInt("numberOfRequests"));
+				reply.setExecuted(rs.getBoolean("executed"));
+				Book book = new Book();
+				book.setId(rs.getInt("bookId"));
+				reply.setBook(book);
+				result.add(reply);
 			}
 		} catch (Exception e) {
 			throw new PersistException(e);
@@ -76,7 +86,7 @@ public class MySqlReplyDao extends AbstractJDBCDao<Reply, Integer> {
 	protected void prepareStatementForInsert(PreparedStatement statement,
 			Reply object) throws PersistException {
 		try {
-			statement.setInt(1, object.getBookId());
+			statement.setInt(1, object.getBook().getId());
 			statement.setInt(2, object.getNumberOfRequests());
 			statement.setInt(3, object.getId());
 			statement.setBoolean(4, object.isExecuted());
@@ -89,7 +99,7 @@ public class MySqlReplyDao extends AbstractJDBCDao<Reply, Integer> {
 	protected void prepareStatementForUpdate(PreparedStatement statement,
 			Reply object) throws PersistException {
 		try {
-			statement.setInt(1, object.getBookId());
+			statement.setInt(1, object.getBook().getId());
 			statement.setInt(2, object.getNumberOfRequests());
 			statement.setInt(3, object.getId());
 			statement.setBoolean(4, object.isExecuted());

@@ -1,5 +1,6 @@
 package com.danco.training.dobrilko.controller.api;
 
+import java.sql.Connection;
 import java.util.Date;
 
 public interface IBookshopController {
@@ -20,13 +21,13 @@ public interface IBookshopController {
 
 	public Integer getNumberOfExecutedOrders(Date startDate, Date endDate);
 
-	public void sortOrdersByDate();
+	public String sortOrdersByDate();
 
-	public void sortOrdersByExecution();
+	public String sortOrdersByExecution();
 
-	public void markUnclaimedBooks();
+	public void markUnclaimedBooks(Connection connection);
 
-	public void sortOrdersByPrice();
+	public String sortOrdersByPrice();
 
 	public String getOrderStringById(Integer id);
 
@@ -38,11 +39,11 @@ public interface IBookshopController {
 
 	public String getUnclaimedBooks();
 
-	public void sortBookByPublicationDate();
+	public String sortBookByPublicationDate();
 
-	public void sortBookByName();
+	public String sortBookByName();
 
-	public void sortBookByPrice();
+	public String sortBookByPrice();
 
 	public String getBookById(Integer id);
 
@@ -50,11 +51,11 @@ public interface IBookshopController {
 
 	public void sortRepliesByAlphabet();
 
-	public void sortRepliesByNumber();
+	public String sortRepliesByNumber();
 
 	public void addReply(String replyString);
 
-	public void markRepliesAsExecuted();
+	public void markRepliesAsExecuted(Connection connection);
 
 	public String getReplyById(Integer id);
 

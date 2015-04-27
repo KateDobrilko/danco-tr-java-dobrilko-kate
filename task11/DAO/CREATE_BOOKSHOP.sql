@@ -1,8 +1,8 @@
 
-CREATE SCHEMA IF NOT EXISTS `Bookshop` DEFAULT CHARACTER SET utf8;
+CREATE SCHEMA IF NOT EXISTS `Bookshop1` DEFAULT CHARACTER SET utf8;
 
 
-USE `Bookshop`;
+USE `Bookshop1`;
 
 
 CREATE TABLE IF NOT EXISTS `book` (
@@ -14,15 +14,17 @@ CREATE TABLE IF NOT EXISTS `book` (
    `dateOfPublication` DATE NOT NULL ,
    `dateOfAddition` DATE NULL ,
    `price` REAL NOT NULL ,   
-    PRIMARY KEY (`id`) 
+   `orderId` INT NOT NULL, 
+    PRIMARY KEY (`id`),
+    FOREIGHN KEY (orderId) REFERENCES order(id)
   
 );
 
 CREATE TABLE IF NOT EXISTS `order` (
    `id` INT NOT NULL AUTO_INCREMENT ,
-   `bookId` INT NOT NULL ,
    `dateOfExecution` DATE NULL ,
    `status` TINYINT(1) NOT NULL ,
+   `sum` REAL NOT NULL,
    PRIMARY KEY (`id`) 
    
 );
@@ -32,5 +34,7 @@ CREATE TABLE IF NOT EXISTS `reply` (
    `numberOfRequests` INT NOT NULL ,
    `executed` TINYINT(1)  NOT NULL ,
    `bookId` INT NOT NULL ,
-   PRIMARY KEY (`id`) 
+   PRIMARY KEY (`id`),
+   FOREIGHN KEY (bookId) REFERENCES book(id)
+   
 );

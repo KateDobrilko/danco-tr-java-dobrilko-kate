@@ -1,35 +1,24 @@
 package com.danco.training.dobrilko.entity;
 
-import java.io.Serializable;
+import com.danco.training.dobrilko.daoentity.PKHolder;
 
-import com.danco.training.dobrilko.daoentity.Identified;
-
-public class Reply  implements Serializable, Identified<Integer> {
-
-	private static final long serialVersionUID = 6786433132109699480L;
+public class Reply implements PKHolder<Integer> {
 
 	private int id;
 	private int numberOfRequests;
 	private boolean executed = false;
-	private Integer bookId;
+	private Book book;
 
 	public Reply() {
 	}
 
-	public Reply(Integer bookId, int numberOfRequests, int id, boolean executed) {
-		this.bookId = bookId;
+	public Reply(Integer bookId, int numberOfRequests, int id,
+			boolean executed, Book book) {
+		this.book = book;
 		this.numberOfRequests = numberOfRequests;
 		this.id = id;
 		this.executed = executed;
 
-	}
-
-	public Integer getBookId() {
-		return bookId;
-	}
-
-	public void setBookId(Integer bookId) {
-		this.bookId = bookId;
 	}
 
 	public Integer getId() {
@@ -54,6 +43,14 @@ public class Reply  implements Serializable, Identified<Integer> {
 
 	public void setExecuted(boolean executed) {
 		this.executed = executed;
+	}
+
+	public Book getBook() {
+		return book;
+	}
+
+	public void setBook(Book book) {
+		this.book = book;
 	}
 
 }

@@ -6,38 +6,46 @@ import java.util.InputMismatchException;
 public class SpecificIOFeaturesUtil {
 	@SuppressWarnings("deprecation")
 	public static String readBook() throws InputMismatchException {
+		IOUtil.print("Id:");
+		Integer id = IOUtil.readInt();
 		IOUtil.print("Name:");
 		String name = IOUtil.readString();
 		IOUtil.print("Author:");
 		String author = IOUtil.readString();
+		IOUtil.print("Ordered?");
+		Boolean ordered = IOUtil.readBoolean();
 		IOUtil.print("Price:");
 		double price = IOUtil.readDouble();
-		IOUtil.print("Id:");
-		int id = IOUtil.readInt();
 		Date dop = SpecificIOFeaturesUtil.readDate();
-		Date cur = new Date();
-		cur.setMonth(cur.getMonth() + 1);
-		cur.setYear(cur.getYear() + 1900);
+		Date doa = new Date();
+		IOUtil.print("Order Id:");
+		Integer orderId = IOUtil.readInt();
+		doa.setMonth(doa.getMonth() + 1);
+		doa.setYear(doa.getYear() + 1900);
 		StringBuilder sb = new StringBuilder();
+		sb.append(Integer.toString(id));
+		sb.append(";");
 		sb.append(name);
 		sb.append(";");
 		sb.append(author);
 		sb.append(";");
-		sb.append(Double.toString(price));
+        sb.append(ordered);
 		sb.append(";");
-		sb.append(Integer.toString(id));
+		sb.append(Integer.toString(doa.getYear()));
 		sb.append(";");
-		sb.append(Integer.toString(cur.getYear()));
+		sb.append(Integer.toString(doa.getMonth()));
 		sb.append(";");
-		sb.append(Integer.toString(cur.getMonth()));
-		sb.append(";");
-		sb.append(Integer.toString(cur.getDate()));
+		sb.append(Integer.toString(doa.getDate()));
 		sb.append(";");
 		sb.append(Integer.toString(dop.getYear()));
 		sb.append(";");
 		sb.append(Integer.toString(dop.getMonth()));
 		sb.append(";");
 		sb.append(Integer.toString(dop.getDate()));
+		sb.append(";");
+		sb.append(Double.toString(price));
+		sb.append(";");
+		sb.append(Integer.toString(orderId));
 		return sb.toString();
 
 	}
@@ -47,48 +55,24 @@ public class SpecificIOFeaturesUtil {
 		StringBuilder sb = new StringBuilder();
 		IOUtil.print("Order id:");
 		int id = IOUtil.readInt();
-		IOUtil.print("Number of books:");
-		int num = IOUtil.readInt();
-
 		IOUtil.print("Executed?:");
 		boolean status = IOUtil.readBoolean();
+		IOUtil.print("Sum:");
+		double sum = IOUtil.readDouble();
 
-		if (status == true) {
-			Date date = readDate();
-			sb.append(id);
-			sb.append(";");
-			sb.append(num);
-			sb.append(";");
-			sb.append("true");
-			sb.append(";");
-			sb.append(date.getYear());
-			sb.append(";");
-			sb.append(date.getMonth());
-			sb.append(";");
-			sb.append(date.getDate());
-			sb.append(System.lineSeparator());
-			for (int i = 0; i < num; i++) {
-				IOUtil.print("Book #" + i + " id:");
-				sb.append(IOUtil.readInt());
-				sb.append(";");
-				sb.append(System.lineSeparator());
-			}
+		Date date = readDate();
+		sb.append(id);
+		sb.append(";");
+		sb.append(date.getYear());
+		sb.append(";");
+		sb.append(date.getMonth());
+		sb.append(";");
+		sb.append(date.getDate());
+		sb.append(status);
+		sb.append(";");
+		sb.append(sum);
+		sb.append(System.lineSeparator());
 
-		} else {
-			sb.append(id);
-			sb.append(";");
-			sb.append(num);
-			sb.append(";");
-			sb.append("false");
-			sb.append(";");
-			sb.append(System.lineSeparator());
-			for (int i = 0; i < num; i++) {
-				IOUtil.print("Book #" + i + " id:");
-				sb.append(IOUtil.readInt());
-				sb.append(";");
-				sb.append(System.lineSeparator());
-			}
-		}
 		return sb.toString();
 	}
 
@@ -104,13 +88,10 @@ public class SpecificIOFeaturesUtil {
 		sb.append(";");
 		sb.append(Integer.toString(id));
 		sb.append(";");
-		if (executed == true) {
-			sb.append("true");
-		} else {
-			sb.append("false");
-		}
-		sb.append(System.lineSeparator());
+		sb.append(executed);
+		sb.append(";");
 		sb.append(readBook());
+		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
 
