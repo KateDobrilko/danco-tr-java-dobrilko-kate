@@ -14,7 +14,7 @@ public class Order implements Cloneable, PKHolder<Integer> {
 
 	}
 
-	public Order(int id, boolean status, Date dateOfExecution, Double sum) {
+	public Order(int id, Date dateOfExecution, Double sum) {
 		this.setId(id);
 		this.setDateOfExecution(dateOfExecution);
 		if (dateOfExecution == null) {

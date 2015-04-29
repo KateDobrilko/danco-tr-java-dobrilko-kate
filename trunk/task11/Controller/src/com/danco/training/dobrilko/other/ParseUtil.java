@@ -1,6 +1,5 @@
 package com.danco.training.dobrilko.other;
 
-import java.sql.Connection;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -15,7 +14,6 @@ import com.danco.training.dobrilko.mysql.MySqlBookDao;
 
 public class ParseUtil {
 
-	private static Connection connection;
 	private static Logger logger = Logger.getLogger(ParseUtil.class);
 
 	public static Book parseBookString(String bookString) {
@@ -23,10 +21,11 @@ public class ParseUtil {
 		Book book = null;
 
 		if (parsedString.length == 10) {
-			String name = parsedString[0];
-			String author = parsedString[1];
-			double price = Double.parseDouble(parsedString[2]);
-			int id = Integer.parseInt(parsedString[3]);
+
+			String name = parsedString[1];
+			String author = parsedString[2];
+			double price = Double.parseDouble(parsedString[3]);
+			int id = Integer.parseInt(parsedString[0]);
 			int curYear = Integer.parseInt(parsedString[4]);
 			int curMonth = Integer.parseInt(parsedString[5]);
 			int curDay = Integer.parseInt(parsedString[6]);
@@ -44,56 +43,33 @@ public class ParseUtil {
 
 	}
 
-	@SuppressWarnings({ "deprecation" })
 	public static Order parseOrderString(String orderString) {
-		String[] strings = orderString.split(System.lineSeparator());
-		String[] orderDescription;
+		String[] strings = orderString.split(";");
 
-		if (strings.length > 1) {
-			orderDescription = strings[0].split(";");
-			Date date;
-			int id;
+		Integer id = Integer.parseInt(strings[0]);
+		Double sum = Double.parseDouble(strings[1]);
 
-			if (orderDescription.length < 4) {
-				id = Integer.parseInt(orderDescription[0]);
-				boolean status = orderDescription[1].equals("true");
-				date = null;
-
-				return new Order(id, status, date, 0.0);
-			}
-
-			else {
-				id = Integer.parseInt(orderDescription[0]);
-
-				boolean status = orderDescription[1].equals("true");
-				int year = Integer.parseInt(orderDescription[2]);
-				int month = Integer.parseInt(orderDescription[3]);
-				int day = Integer.parseInt(orderDescription[4]);
-				date = new Date(year, month, day);
-
-				return new Order(id, status, date, 0.0);
-			}
-
-		} else {
-			return null;
-		}
+		return new Order(id, null, sum);
 
 	}
 
 	public static Reply parseReplyString(String replyString) {
 
-		String[] strings = replyString.split(System.lineSeparator());
-		String[] replyDescription;
-		if (strings.length > 1) {
-			replyDescription = strings[0].split(";");
-			int id = Integer.parseInt(replyDescription[0]);
-			int numberOfRequests = Integer.parseInt(replyDescription[1]);
-			boolean executed = replyDescription[2].equals("true");
-			Book book = parseBookString(strings[1]);
-			return new Reply(book.getId(), numberOfRequests, id, executed, book);
-		} else {
-			return null;
+		String[] strings = replyString.split(";");
+
+		int id = Integer.parseInt(strings[1]);
+		int numberOfRequests = Integer.parseInt(strings[0]);
+		boolean executed = strings[2].equals("true");
+		Reply reply = null;
+		GenericDao<Book, Integer> dao = new MySqlBookDao();
+		try {
+			reply = new Reply(numberOfRequests, id, executed, dao.getByPK(
+					Integer.parseInt(strings[3]),
+					ConnectionManager.getConnection()));
+		} catch (NumberFormatException | PersistException e) {
+			logger.error(e);
 		}
+		return reply;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -179,7 +155,7 @@ public class ParseUtil {
 			sb.append("';");
 
 			sb.append(bookToString(dao.getByPK(reply.getBook().getId(),
-					connection)));
+					ConnectionManager.getConnection())));
 
 			sb.append(";'");
 			sb.append(Integer.toString(reply.getNumberOfRequests()));
