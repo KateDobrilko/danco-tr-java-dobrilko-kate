@@ -12,7 +12,7 @@ public class Reply implements PKHolder<Integer> {
 	public Reply() {
 	}
 
-	public Reply(Integer bookId, int numberOfRequests, int id,
+	public Reply( int numberOfRequests, int id,
 			boolean executed, Book book) {
 		this.book = book;
 		this.numberOfRequests = numberOfRequests;
