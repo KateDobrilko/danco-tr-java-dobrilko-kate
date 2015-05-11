@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+        <session-factory>
+                <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+                <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+                <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/bookdanco</property>
+                <property name="hibernate.connection.username">root</property>
+                <property name="hibernate.connection.password">teRR_2i2_TAng_vXC</property>
+                <mapping class="com.danco.training.dobrilko.ModelDB.entity.Book" />
+                <mapping class="com.danco.training.dobrilko.ModelDB.entity.Reply" />
+                <mapping class="com.danco.training.dobrilko.ModelDB.entity.Order" />
+        </session-factory>
+</hibernate-configuration>
