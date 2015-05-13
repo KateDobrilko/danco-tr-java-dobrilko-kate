@@ -17,8 +17,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="src/main/java/com/danco/training/dobrilko/Controller/lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="src/main/java/com/danco/training/dobrilko/Controller/lib/hibernate-core-4.3.9.Final.jar"/>
 	<classpathentry kind="src" path="/ModelDB"/>
 	<classpathentry kind="src" path="/API"/>
 	<classpathentry kind="src" path="/PropertyController"/>
