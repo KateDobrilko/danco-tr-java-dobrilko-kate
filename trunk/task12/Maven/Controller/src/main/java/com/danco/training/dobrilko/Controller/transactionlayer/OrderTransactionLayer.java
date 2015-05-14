@@ -65,7 +65,8 @@ public class OrderTransactionLayer {
 
 	public void cancelOrder(Integer id) throws PersistException {
 		Session session = HibernateUtil.getInstance().getSessionFactory()
-				.getCurrentSession();
+				.openSession();
+
 		Transaction tr = session.beginTransaction();
 		for (Book book : ((HibernateOrderDAO) daoOrder).getBooksByOrderId(
 				session, id)) {
@@ -75,7 +76,7 @@ public class OrderTransactionLayer {
 		}
 		daoOrder.delete(session, daoOrder.getByPK(session, id));
 		tr.commit();
-
+		session.close();
 	}
 
 	public void executeOrder(Integer id) throws PersistException {

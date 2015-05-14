@@ -2,6 +2,7 @@ package com.danco.training.dobrilko.ModelDB.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,10 +37,10 @@ public class Book implements PKHolder<Integer> {
 	@Column(name = "arrivalDate")
 	private Date arrivalDate;
 	private Boolean uncalimed;
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "book")
-	private ArrayList<Order> relatedOrders;
-	@OneToMany(mappedBy = "reply")
-	private ArrayList<Reply> relatedReplies;
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "books")
+	private List<Order> relatedOrders;
+	@OneToMany(mappedBy = "book")
+	private List<Reply> relatedReplies;
 
 	public Book() {
 
