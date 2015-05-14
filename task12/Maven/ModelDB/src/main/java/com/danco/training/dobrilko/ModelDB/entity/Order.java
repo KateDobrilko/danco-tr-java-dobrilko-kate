@@ -2,6 +2,7 @@ package com.danco.training.dobrilko.ModelDB.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,7 +33,7 @@ public class Order implements PKHolder<Integer>{
 	@JoinTable(name = "order_to_book", joinColumns = { 
 			@JoinColumn(name = "idO", nullable = false) }, 
 			inverseJoinColumns = { @JoinColumn(name = "idB", nullable = false) })
-	private ArrayList<Book> books;
+	private List<Book> books;
 
 	public Order()  {
 
@@ -47,7 +48,7 @@ public class Order implements PKHolder<Integer>{
 
 	}
 
-	public ArrayList<Book> getBooks() {
+	public List<Book> getBooks() {
 		return books;
 	}
 

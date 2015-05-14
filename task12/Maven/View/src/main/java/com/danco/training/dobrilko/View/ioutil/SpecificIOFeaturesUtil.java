@@ -90,7 +90,7 @@ public class SpecificIOFeaturesUtil {
 		return new Date(IOUtil.readInt(), IOUtil.readInt(), IOUtil.readInt());
 	}
 
-	public static int readId() throws InputMismatchException {
+	public static Integer readId() throws InputMismatchException {
 		IOUtil.print("Id:");
 		return IOUtil.readInt();
 	}
