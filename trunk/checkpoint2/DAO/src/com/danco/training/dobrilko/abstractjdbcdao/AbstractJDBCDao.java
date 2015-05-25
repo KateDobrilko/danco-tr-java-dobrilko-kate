@@ -61,20 +61,7 @@ public abstract class AbstractJDBCDao<T extends PKHolder<PK>, PK extends Integer
 		} catch (Exception e) {
 			throw new PersistException(e);
 		}
-/*
-		sql = getSelectQuery() + WHERE_ID_LAST_INSERT_ID;
-		try (PreparedStatement statement = connection.prepareStatement(sql)) {
-			ResultSet rs = statement.executeQuery();
-			List<T> list = parseResultSet(rs);
-			if ((list == null) || (list.size() != 1)) {
-				throw new PersistException(
-						EXCEPTION_ON_FIND_BY_PK_NEW_PERSIST_DATA);
-			}
-			persistInstance = list.iterator().next();
-		} catch (Exception e) {
-			throw new PersistException(e);
-		}
-		return persistInstance;*/
+
 	}
 
 	@Override
